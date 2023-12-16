@@ -66,6 +66,7 @@ bug_bite = Move("Bug Bite", 'bug', 7, 85)
 psychic = Move("Psychic", 'psychic', 8, 90)
 shadow_ball = Move("Shadow Ball", 'ghost', 8, 90)
 rock_throw = Move("Rock Throw", 'rock', 8, 90)
+low_kick = Move("Low Kick", 'fighting', 8, 90)
 
 
 # move sets
@@ -239,16 +240,16 @@ class Charmander(Pokemon):
     
     def __init__(self, level=5, name='', player_owned=False):
         super().__init__('Charmander', 35, 'fire', 1.1, 1.1, level, fire_moves, name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 16
         self.evolve_pokemon1 = Charmeleon()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 36
         self.evolve_pokemon2 = Charizard()
 
 class Charmeleon(Pokemon):
     
     def __init__(self, level=8, name='', player_owned=False):
         super().__init__('Charmeleon', 40, 'fire', 1.15, 1.1, level, fire_moves, name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 36
         self.evolve_pokemon1 = Charizard()
 
 class Charizard(Pokemon):
@@ -260,16 +261,16 @@ class Bulbasaur(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Bulbasaur', 40, 'grass', 1, 1, level, grass_moves, name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 16
         self.evolve_pokemon1 = Ivysaur()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 32
         self.evolve_pokemon2 = Venusaur()
 
 class Ivysaur(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
         super().__init__('Ivysaur', 45, 'grass', 1.1, 1, level, grass_moves, name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 32
         self.evolve_pokemon1 = Venusaur()
 
 class Venusaur(Pokemon):
@@ -281,16 +282,16 @@ class Squirtle(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Squirtle', 38, 'water', 1.05, 1.05, level, water_moves, name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 16
         self.evolve_pokemon1 = Wartortle()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 32
         self.evolve_pokemon2 = Blastoise()
 
 class Wartortle(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
         super().__init__('Wartortle', 42, 'water', 1.1, 1.05, level, water_moves, name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 32
         self.evolve_pokemon1 = Blastoise()
 
 class Blastoise(Pokemon):
@@ -302,19 +303,43 @@ class Rattata(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Rattata', 40, 'normal', 1.05, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
-        self.evolve_pokemon1 = Ratticate()
-        self.evolve_level1 = 8
+        self.evolve_pokemon1 = Raticate()
+        self.evolve_level1 = 20
+        
+class Staryu(Pokemon):
 
-class Ratticate(Pokemon):
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Staryu', 36, 'water', 1.05, 1.05, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
+        self.evolve_pokemon1 = Starmie()
+        self.evolve_level1 = 36
+        
+class Starmie(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Starmie', 41, 'water', 1.15, 1.05, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
+        
+class Goldeen(Pokemon):
+    
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Goldeen', 36, 'water', 1.05, 1.05, level, [tackle, bubble, confuse_ray], name, player_owned)
+        self.evolve_level1 = 33
+        self.evolve_pokemon1 = Seaking()
+        
+class Seaking(Pokemon):
+    
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Seaking', 42, 'water', 1.1, 1.05, level, [tackle, bubble, confuse_ray], name, player_owned)
+
+class Raticate(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Ratticate', 42, 'normal', 1.1, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
+        super().__init__('Raticate', 42, 'normal', 1.1, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
 
 class Magikarp(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Magikarp', 38, 'water', 1, 1.15, level, [splash], name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 20
         self.evolve_pokemon1 = Gyarados()
 
 class Gyarados(Pokemon):
@@ -326,16 +351,16 @@ class Caterpie(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Caterpie', 36, 'bug', 1.05, 1.05, level, [confuse_ray, vine_whip, toxic], name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 7
         self.evolve_pokemon1 = Metapod()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 10
         self.evolve_pokemon2 = Butterfree()
 
 class Metapod(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
         super().__init__('Metapod', 42, 'bug', 1.05, 1, level, [confuse_ray, vine_whip, toxic], name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 10
         self.evolve_pokemon1 = Butterfree()
 
 class Butterfree(Pokemon):
@@ -353,15 +378,15 @@ class Pidgey(Pokemon):
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Pidgey', 35, 'flying', 1.15, 1.15, level, [wing_attack, scratch], name, player_owned)
         self.evolve_pokemon1 = Pidgeotto()
-        self.evolve_level1 = 8
+        self.evolve_level1 = 18
         self.evolve_pokemon2 = Pidgeot()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 36
 
 class Pidgeotto(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
         super().__init__('Pidgeotto', 38, 'flying', 1.17, 1.1, level, [wing_attack, scratch], name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 36
         self.evolve_pokemon1 = Pidgeot()
 
 class Pidgeot(Pokemon):
@@ -373,16 +398,16 @@ class Weedle(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Weedle', 34, 'bug', 1.05, 1.15, level, [confuse_ray, tackle, toxic], name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 7
         self.evolve_pokemon1 = Kakuna()
-        self.evolve_level2 = 12
+        self.evolve_level2 = 10
         self.evolve_pokemon2 = Beedrill()
 
 class Kakuna(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
         super().__init__('Kakuna', 42, 'bug', 1.05, 1, level, [confuse_ray, vine_whip, yawn, toxic], name, player_owned)
-        self.evolve_level1 = 12
+        self.evolve_level1 = 10
         self.evolve_pokemon1 = Beedrill()
 
 class Beedrill(Pokemon):
@@ -399,7 +424,7 @@ class Diglett(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Diglett', 40, 'ground', 1.1, 1.15, level, [bulldoze, tackle, confuse_ray], name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 26
         self.evolve_pokemon1 = Dugtrio()
 
 class Dugtrio(Pokemon):
@@ -411,7 +436,7 @@ class Cubone(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Cubone', 40, 'ground', 1.15, 1.05, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 28
         self.evolve_pokemon1 = Marowak()
 
 class Marowak(Pokemon):
@@ -423,7 +448,7 @@ class Magnemite(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Magnemite', 40, 'electric', 1.05, 1.05, level, [confuse_ray, spark, paralyze], name, player_owned)
-        self.evolve_level1 = 8
+        self.evolve_level1 = 30
         self.evolve_pokemon1 = Magneton()
 
 class Magneton(Pokemon):
@@ -436,7 +461,7 @@ class Geodude(Pokemon):
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Geodude', 40, 'normal', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
         self.evolve_pokemon1 = Graveler()
-        self.evolve_level1 = 8
+        self.evolve_level1 = 25
 
 class Graveler(Pokemon):
 
@@ -447,6 +472,90 @@ class Onix(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
         super().__init__('Onix', 40, 'rock', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze, tackle], name, player_owned)
+        
+class Bellsprout(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Bellsprout', 34, 'grass', 1.05, 1.1, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
+        self.evolve_level1 = 21
+        self.evolve_pokemon1 = Weepinbell()
+        
+class Weepinbell(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Weepinbell', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
+        
+class Oddish(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Oddish', 35, 'grass', 1.1, 1.15, level, [tackle, vine_whip, confuse_ray], name, player_owned)
+        self.evolve_level1 = 21
+        self.evolve_pokemon1 = Gloom()
+        
+class Gloom(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Gloom', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray], name, player_owned)
+
+class Spearow(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Spearow', 37, 'flying', 1.1, 1.1, level, [scratch, wing_attack, confuse_ray], name, player_owned)
+        self.evolve_level1 = 21
+        self.evolve_pokemon1 = Fearow()
+        
+class Fearow(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Fearow', 39, 'flying', 1.15, 1.1, level, [scratch, wing_attack, confuse_ray], name, player_owned)
+        
+class Ekans(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Ekans', 37, 'poison', 1.15, 1.1, level, [toxic, tackle, paralyze], name, player_owned)
+        self.evolve_level1 = 22
+        self.evolve_pokemon1 = Arbok()
+        
+class Arbok(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Arbok', 39, 'poison', 1.17, 1.1, level, [toxic, tackle, paralyze], name, player_owned)
+        
+class Sandshrew(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Sandshrew', 36, 'ground', 1.13, 1.1, level, [scratch, bulldoze, paralyze], name, player_owned)
+        self.evolve_level1 = 22
+        self.evolve_pokemon1 = Sandslash()
+        
+class Sandslash(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Sandslash', 39, 'ground', 1.17, 1.1, level, [scratch, bulldoze, paralyze], name, player_owned)
+        
+class Mankey(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Mankey', 36, 'fighting', 1.12, 1.16, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
+        self.evolve_level1 = 28
+        self.evolve_pokemon1 = Primeape()
+        
+class Primeape(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Primeape', 40, 'fighting', 1.16, 1.12, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
+        
+class Zubat(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Zubat', 35, 'flying', 1.08, 1.12, level, [paralyze, tackle, wing_attack], name, player_owned)
+        self.evolve_level1 = 22
+        self.evolve_pokemon1 = Golbat()
+        
+class Golbat(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Golbat', 40, 'flying', 1.1, 1.11, level, [paralyze, tackle, wing_attack], name, player_owned)
 
 class Battle:
 
@@ -674,7 +783,7 @@ class Battle:
             average_player_level += pokemon.level
         average_enemy_level = average_enemy_level/len(self.trainer_pokemon)
         average_player_level = average_player_level/len(self.user_pokemon)
-        return round((random.randint(50, 70)*(average_enemy_level/average_player_level)))
+        return round((random.randint(30, 60)*(average_enemy_level/average_player_level)))
         
     def battle_check(self):
         if not self.alive_check(self.active_pokemon):
@@ -1324,7 +1433,7 @@ class PewterCity(MapLocation):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
-        self.pokemon_gym = PokemonGym([Rattata(), Pidgey()], [8, 9, 10], [Pidgey(10), Pikachu(11), Charmander(12)], "Brock", "Pewter City Gym")
+        self.pokemon_gym = PokemonGym(Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_gym, self.pokemon_center, self.pokemart]
@@ -1348,7 +1457,7 @@ class CeruleanCity(MapLocation):
     def __init__(self):
         super().__init__("Cerulean City")
         self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball()])
-        self.pokemon_gym = PokemonGym([Rattata(), Pidgey()], [8, 9, 10], [Pidgey(10), Pikachu(11), Charmander(12)], "Misty", "Cerulean City Gym")
+        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [Staryu(18), Starmie(21)], "Misty", "Cerulean City Gym")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart]
@@ -1363,14 +1472,16 @@ pallet_town = PalletTown()
 viridian_city = ViridianCity()
 pewter_city = PewterCity()
 mount_moon = MountMoon()
+cerulean_city = CeruleanCity()
 
 # initializing
-route1 = Route([Magikarp(), Rattata(), Pidgey()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey()], name="Route 1")
-viridian_forest = Route([Weedle(), Caterpie(), Vulpix(), Pikachu()], [6, 7, 8], viridian_city, pewter_city, trainer_levels=[7, 8], trainer_pokemon=[Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
-route3 = Route([Vulpix(), Rattata(), Weedle(), Pikachu()], [8, 9, 10], mount_moon, pewter_city, trainer_levels= [9, 10, 11], trainer_pokemon=[Pikachu(), Vulpix(), Rattata()], name="Route 3")
-mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude()], [9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
+route1 = Route([Magikarp(), Rattata(), Pidgey(), Oddish(), Bellsprout()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey(), Oddish(), Bellsprout()], name="Route 1")
+viridian_forest = Route([Weedle(), Caterpie(), Bellsprout(), Rattata(), Pikachu()], [4, 5, 6], viridian_city, pewter_city, trainer_levels=[4, 5, 6], trainer_pokemon=[Bellsprout(), Rattata(), Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
+route3 = Route([Pidgey(), Spearow(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
+mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
+route4 = Route([Ekans(), Spearow(), Sandshrew(), Mankey(), Raticate()], [10, 11, 12, 13], mount_moon, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Route 4")
 map_object = MapLocation("Map")
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon]
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city]
 player.initialize()
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest)

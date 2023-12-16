@@ -1437,4 +1437,4 @@ if __name__ == "__main__":
             new_line()
             slow_type("Ah, you're back. Let's try that again.")
 
-    player.map_location.location_loop()
+    player.map_location.location_loop()#test

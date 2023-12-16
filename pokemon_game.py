@@ -65,6 +65,7 @@ paralyze = Move("Paralyze", 'electric', 0, 60, special=True, status='paralyzed')
 bug_bite = Move("Bug Bite", 'bug', 7, 85)
 psychic = Move("Psychic", 'psychic', 8, 90)
 shadow_ball = Move("Shadow Ball", 'ghost', 8, 90)
+rock_throw = Move("Rock Throw", 'rock', 8, 90)
 
 
 # move sets
@@ -409,14 +410,14 @@ class Dugtrio(Pokemon):
 class Cubone(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Cubone', 40, 'ground', 1.15, 1.05, level, [scratch, tackle, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Cubone', 40, 'ground', 1.15, 1.05, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
         self.evolve_level1 = 8
         self.evolve_pokemon1 = Marowak()
 
 class Marowak(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Marowak', 42, 'ground', 1.15, 1.1, level, [scratch, tackle, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Marowak', 42, 'ground', 1.15, 1.1, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
 
 class Magnemite(Pokemon):
 
@@ -433,14 +434,19 @@ class Magneton(Pokemon):
 class Geodude(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Geodude', 40, 'normal', 1.1, 1.05, level, [yawn, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Geodude', 40, 'normal', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
         self.evolve_pokemon1 = Graveler()
         self.evolve_level1 = 8
 
 class Graveler(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Graveler', 44, 'normal', 1.1, 1.05, level, [yawn, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Graveler', 44, 'normal', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
+        
+class Onix(Pokemon):
+
+    def __init__(self, level=5, name="", player_owned=False):
+        super().__init__('Onix', 40, 'rock', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze, tackle], name, player_owned)
 
 class Battle:
 
@@ -1317,7 +1323,7 @@ class PewterCity(MapLocation):
     def __init__(self):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball()])
+        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
         self.pokemon_gym = PokemonGym([Rattata(), Pidgey()], [8, 9, 10], [Pidgey(10), Pikachu(11), Charmander(12)], "Brock", "Pewter City Gym")
 
     def initialize(self, *routes):
@@ -1330,12 +1336,24 @@ class MountMoon(MapLocation):
 
     def __init__(self):
         super().__init__("Mount Moon")
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball(), Ultraball()])
+        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart]
         for route in routes:
-            self.local_locations.insert(0, route)    
+            self.local_locations.insert(0, route)
+            
+class CeruleanCity(MapLocation):
+
+    def __init__(self):
+        super().__init__("Cerulean City")
+        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball()])
+        self.pokemon_gym = PokemonGym([Rattata(), Pidgey()], [8, 9, 10], [Pidgey(10), Pikachu(11), Charmander(12)], "Misty", "Cerulean City Gym")
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemart]
+        for route in routes:
+            self.local_locations.insert(0, route)
 
 # create plaayer
 player = Player(money=0)
@@ -1348,7 +1366,7 @@ mount_moon = MountMoon()
 
 # initializing
 route1 = Route([Magikarp(), Rattata(), Pidgey()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey()], name="Route 1")
-viridian_forest = Route([Weedle(), Caterpie(), Vulpix(), Pikachu()], [6, 7, 8], viridian_city, pewter_city, trainer_levels=[7, 8], trainer_pokemon=[Pikachu(), Weedle(), Caterpie()], name="Viridian Forest")
+viridian_forest = Route([Weedle(), Caterpie(), Vulpix(), Pikachu()], [6, 7, 8], viridian_city, pewter_city, trainer_levels=[7, 8], trainer_pokemon=[Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
 route3 = Route([Vulpix(), Rattata(), Weedle(), Pikachu()], [8, 9, 10], mount_moon, pewter_city, trainer_levels= [9, 10, 11], trainer_pokemon=[Pikachu(), Vulpix(), Rattata()], name="Route 3")
 mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude()], [9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
 map_object = MapLocation("Map")

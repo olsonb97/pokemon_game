@@ -1433,7 +1433,7 @@ class PewterCity(MapLocation):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
-        self.pokemon_gym = PokemonGym(Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym")
+        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_gym, self.pokemon_center, self.pokemart]

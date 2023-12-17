@@ -1,6 +1,8 @@
 import random
 import time
 import copy
+import pickle
+import os
 
 def slow_type(text, delay=0.005):
 
@@ -59,15 +61,20 @@ splash = Move("Spash", 'normal', 0, 50)
 wing_attack = Move("Wing Attack", 'normal', 8, 90)
 scratch = Move("Scratch", 'normal', 7, 95)
 spark = Move("Spark", 'normal', 10, 85)
-bulldoze = Move("Bulldoze", 'ground', 10, 80)
+bulldoze = Move("Bulldoze", 'ground', 9, 85)
 toxic = Move("Toxic", 'poison', 0, 80, special=True, status='poisoned')
 paralyze = Move("Paralyze", 'electric', 0, 60, special=True, status='paralyzed')
 bug_bite = Move("Bug Bite", 'bug', 7, 85)
-psychic = Move("Psychic", 'psychic', 8, 90)
+psychic = Move("Psychic", 'psychic', 9, 90)
 shadow_ball = Move("Shadow Ball", 'ghost', 8, 90)
 rock_throw = Move("Rock Throw", 'rock', 8, 90)
 low_kick = Move("Low Kick", 'fighting', 8, 90)
-
+aqua_jet = Move("Aqua Jet", 'water', 10, 90)
+flame_wheel = Move("Flame Wheel", 'fire', 10, 90)
+leaf_blade = Move("Leaf Blade", 'grass', 10, 90)
+earthquake = Move("Earthquake", 'ground', 10, 90)
+bug_buss = Move("Bug Buzz", 'bug', 10, 90)
+aerial_ace = Move("Aerial Ace", 'flying', 10, 90)
 
 # move sets
 fire_moves = [ember, tackle, yawn, confuse_ray]
@@ -99,7 +106,6 @@ class Pokemon:
         self.asleep_counter = 0
         self.confused_counter = 0
         self.poisoned_counter = 1
-        self.paralyzed_counter = 0
         self.paralyzed = False
         self.poisoned = False
         self.asleep = False
@@ -207,8 +213,10 @@ class Pokemon:
                 slow_type(f"{self.name} is trying to learn {move}.\nDelete a move to make room?\n1. Yes\n2. No")
                 choice = get_valid_input("Enter number: ", [1, 2])
                 if choice == 1:
+                    new_line()
+                    slow_type(f"\n{move}" + (f" | Power: {move.power}" if not move.special else f" | Status: {move.status.capitalize()}") + (f" | Accuracy: {move.accuracy}\n"))
                     for index, value in enumerate(self.move_set):
-                        slow_type(f"{index + 1}. {value}")
+                        slow_type(f"{index + 1}. {value}" + (f" | Power: {value.power}" if not value.special else f" | Status: {value.status.capitalize()}") + (f" | Accuracy: {value.accuracy}"))
                     move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
                     slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
                     time.sleep(1)
@@ -216,6 +224,15 @@ class Pokemon:
                     self.move_set[move_index] = move
                 elif choice == 2:
                     return
+
+    def status_heal(self):
+        self.asleep = False
+        self.confused = False
+        self.poisoned = False
+        self.paralyzed = False
+        self.asleep_counter = 0
+        self.poisoned_counter = 1
+        self.confused_counter = 0
 
     def evolve(self):
         if self.evolve_level1 <= self.level and self.evolved1 == False:
@@ -263,29 +280,29 @@ class Pokemon:
 class Charmander(Pokemon):
     
     def __init__(self, level=5, name='', player_owned=False):
-        super().__init__('Charmander', 35, 'fire', 1.1, 1.1, level, fire_moves, name, player_owned)
+        super().__init__('Charmander', 35, 'fire', 1.09, 1.11, level, fire_moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Charmeleon()
         self.evolve_level2 = 36
         self.evolve_pokemon2 = Charizard()
-        self.learnable_moves = {6: scratch}
+        self.learnable_moves = {6: paralyze}
 
 class Charmeleon(Pokemon):
     
     def __init__(self, level=8, name='', player_owned=False):
-        super().__init__('Charmeleon', 40, 'fire', 1.15, 1.1, level, fire_moves, name, player_owned)
+        super().__init__('Charmeleon', 40, 'fire', 1.1, 1.11, level, fire_moves, name, player_owned)
         self.evolve_level1 = 36
         self.evolve_pokemon1 = Charizard()
 
 class Charizard(Pokemon):
     
     def __init__(self, level=12, name='', player_owned=False):
-        super().__init__('Charizard', 45, 'fire', 1.19, 1.12, level, fire_moves, name, player_owned)
+        super().__init__('Charizard', 45, 'fire', 1.13, 1.11, level, fire_moves, name, player_owned)
 
 class Bulbasaur(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Bulbasaur', 40, 'grass', 1, 1, level, grass_moves, name, player_owned)
+        super().__init__('Bulbasaur', 40, 'grass', 1.05, 1.07, level, grass_moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Ivysaur()
         self.evolve_level2 = 32
@@ -294,19 +311,19 @@ class Bulbasaur(Pokemon):
 class Ivysaur(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Ivysaur', 45, 'grass', 1.1, 1, level, grass_moves, name, player_owned)
+        super().__init__('Ivysaur', 45, 'grass', 1.08, 1.06, level, grass_moves, name, player_owned)
         self.evolve_level1 = 32
         self.evolve_pokemon1 = Venusaur()
 
 class Venusaur(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Venusaur', 45, 'grass', 1.2, 1, level, grass_moves, name, player_owned)
+        super().__init__('Venusaur', 45, 'grass', 1.11, 1.05, level, grass_moves, name, player_owned)
     
 class Squirtle(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Squirtle', 38, 'water', 1.05, 1.05, level, water_moves, name, player_owned)
+        super().__init__('Squirtle', 38, 'water', 1.05, 1.09, level, water_moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Wartortle()
         self.evolve_level2 = 32
@@ -315,55 +332,55 @@ class Squirtle(Pokemon):
 class Wartortle(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Wartortle', 42, 'water', 1.1, 1.05, level, water_moves, name, player_owned)
+        super().__init__('Wartortle', 42, 'water', 1.07, 1.09, level, water_moves, name, player_owned)
         self.evolve_level1 = 32
         self.evolve_pokemon1 = Blastoise()
 
 class Blastoise(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Blastoise', 42, 'water', 1.15, 1.03, level, water_moves, name, player_owned)
+        super().__init__('Blastoise', 42, 'water', 1.11, 1.06, level, water_moves, name, player_owned)
 
 class Rattata(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Rattata', 40, 'normal', 1.1, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
+        super().__init__('Rattata', 40, 'normal', 1.06, 1.11, level, [tackle, scratch, confuse_ray], name, player_owned)
         self.evolve_pokemon1 = Raticate()
         self.evolve_level1 = 20
-        
+
+class Raticate(Pokemon):
+
+    def __init__(self, level=8, name="", player_owned=False):
+        super().__init__('Raticate', 42, 'normal', 1.09, 1.11, level, [tackle, scratch, confuse_ray], name, player_owned)      
+
 class Staryu(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Staryu', 36, 'water', 1.05, 1.05, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
+        super().__init__('Staryu', 36, 'water', 1.1, 1.11, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
         self.evolve_pokemon1 = Starmie()
         self.evolve_level1 = 36
         
 class Starmie(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Starmie', 41, 'water', 1.15, 1.05, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
+        super().__init__('Starmie', 41, 'water', 1.13, 1.06, level, [tackle, bubble, paralyze, confuse_ray], name, player_owned)
         
 class Goldeen(Pokemon):
     
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Goldeen', 36, 'water', 1.05, 1.05, level, [tackle, bubble, confuse_ray], name, player_owned)
+        super().__init__('Goldeen', 36, 'water', 1.09, 1.11, level, [tackle, bubble, confuse_ray], name, player_owned)
         self.evolve_level1 = 33
         self.evolve_pokemon1 = Seaking()
         
 class Seaking(Pokemon):
     
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Seaking', 42, 'water', 1.1, 1.05, level, [tackle, bubble, confuse_ray], name, player_owned)
-
-class Raticate(Pokemon):
-
-    def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Raticate', 42, 'normal', 1.12, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
+        super().__init__('Seaking', 42, 'water', 1.11, 1.09, level, [tackle, bubble, confuse_ray], name, player_owned)
 
 class Magikarp(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Magikarp', 38, 'water', 1, 1.15, level, [splash], name, player_owned)
+        super().__init__('Magikarp', 38, 'water', 1, 1, level, [splash], name, player_owned)
         self.evolve_level1 = 20
         self.evolve_pokemon1 = Gyarados()
         self.learnable_moves = {20: bubble, 20: tackle}
@@ -371,12 +388,12 @@ class Magikarp(Pokemon):
 class Gyarados(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Gyarados', 43, 'water', 1.2, 1.1, level, [water_moves], name, player_owned)
+        super().__init__('Gyarados', 43, 'water', 1.14, 1.09, level, [water_moves], name, player_owned)
 
 class Caterpie(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Caterpie', 36, 'bug', 1.05, 1.05, level, [confuse_ray, vine_whip, toxic], name, player_owned)
+        super().__init__('Caterpie', 36, 'bug', 1.07, 1.1, level, [confuse_ray, vine_whip, toxic], name, player_owned)
         self.evolve_level1 = 7
         self.evolve_pokemon1 = Metapod()
         self.evolve_level2 = 10
@@ -392,17 +409,17 @@ class Metapod(Pokemon):
 class Butterfree(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Butterfree', 42, 'bug', 1.1, 1.05, level, [confuse_ray, vine_whip, toxic], name, player_owned)
+        super().__init__('Butterfree', 42, 'bug', 1.09, 1.06, level, [confuse_ray, vine_whip, toxic], name, player_owned)
 
 class Vulpix(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Vulpix', 37, 'fire', 1.1, 1.05, level, [ember, tackle, confuse_ray], name, player_owned)
+        super().__init__('Vulpix', 37, 'fire', 1.09, 1.06, level, [ember, tackle, confuse_ray], name, player_owned)
 
 class Pidgey(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Pidgey', 35, 'flying', 1.15, 1.15, level, [wing_attack, scratch], name, player_owned)
+        super().__init__('Pidgey', 35, 'flying', 1.08, 1.09, level, [wing_attack, scratch], name, player_owned)
         self.evolve_pokemon1 = Pidgeotto()
         self.evolve_level1 = 18
         self.evolve_pokemon2 = Pidgeot()
@@ -411,19 +428,19 @@ class Pidgey(Pokemon):
 class Pidgeotto(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Pidgeotto', 38, 'flying', 1.17, 1.1, level, [wing_attack, scratch], name, player_owned)
+        super().__init__('Pidgeotto', 38, 'flying', 1.1, 1.09, level, [wing_attack, scratch], name, player_owned)
         self.evolve_level1 = 36
         self.evolve_pokemon1 = Pidgeot()
 
 class Pidgeot(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Pidgeot', 41, 'flying', 1.19, 1.1, level, [wing_attack, scratch], name, player_owned)
+        super().__init__('Pidgeot', 41, 'flying', 1.12, 1.07, level, [wing_attack, scratch], name, player_owned)
 
 class Weedle(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Weedle', 34, 'bug', 1.05, 1.15, level, [confuse_ray, tackle, toxic], name, player_owned)
+        super().__init__('Weedle', 34, 'bug', 1.07, 1.1, level, [confuse_ray, tackle, toxic], name, player_owned)
         self.evolve_level1 = 7
         self.evolve_pokemon1 = Kakuna()
         self.evolve_level2 = 10
@@ -439,149 +456,149 @@ class Kakuna(Pokemon):
 class Beedrill(Pokemon):
 
     def __init__(self, level=12, name="", player_owned=False):
-        super().__init__('Beedrill', 42, 'bug', 1.1, 1.05, level, [confuse_ray, vine_whip, yawn, toxic], name, player_owned)
+        super().__init__('Beedrill', 42, 'bug', 1.09, 1.06, level, [confuse_ray, vine_whip, yawn, toxic], name, player_owned)
 
 class Pikachu(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Pikachu', 40, 'electric', 1.15, 1.05, level, [scratch, tackle, confuse_ray, spark], name, player_owned)
+        super().__init__('Pikachu', 40, 'electric', 1.09, 1.1, level, [scratch, tackle, confuse_ray, spark], name, player_owned)
 
 class Diglett(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Diglett', 40, 'ground', 1.1, 1.15, level, [bulldoze, tackle, confuse_ray], name, player_owned)
+        super().__init__('Diglett', 40, 'ground', 1.11, 1.09, level, [bulldoze, tackle, confuse_ray], name, player_owned)
         self.evolve_level1 = 26
         self.evolve_pokemon1 = Dugtrio()
 
 class Dugtrio(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Dugtrio', 43, 'ground', 1.13, 1.12, level, [bulldoze, tackle, confuse_ray], name, player_owned)
+        super().__init__('Dugtrio', 43, 'ground', 1.12, 1.09, level, [bulldoze, tackle, confuse_ray], name, player_owned)
 
 class Cubone(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Cubone', 40, 'ground', 1.15, 1.05, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Cubone', 40, 'ground', 1.1, 1.09, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
         self.evolve_level1 = 28
         self.evolve_pokemon1 = Marowak()
 
 class Marowak(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Marowak', 42, 'ground', 1.15, 1.1, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Marowak', 42, 'ground', 1.14, 1.1, level, [scratch, rock_throw, confuse_ray, bulldoze], name, player_owned)
 
 class Magnemite(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Magnemite', 40, 'electric', 1.05, 1.05, level, [confuse_ray, spark, paralyze], name, player_owned)
+        super().__init__('Magnemite', 40, 'electric', 1.07, 1.07, level, [confuse_ray, spark, paralyze], name, player_owned)
         self.evolve_level1 = 30
         self.evolve_pokemon1 = Magneton()
 
 class Magneton(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Magneton', 41, 'electric', 1.1, 1.05, level, [confuse_ray, spark, paralyze], name, player_owned)
+        super().__init__('Magneton', 41, 'electric', 1.09, 1.07, level, [confuse_ray, spark, paralyze], name, player_owned)
 
 class Geodude(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Geodude', 40, 'normal', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Geodude', 40, 'rock', 1.07, 1.07, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
         self.evolve_pokemon1 = Graveler()
         self.evolve_level1 = 25
 
 class Graveler(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Graveler', 44, 'normal', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
+        super().__init__('Graveler', 44, 'rock', 1.1, 1.07, level, [rock_throw, confuse_ray, bulldoze], name, player_owned)
         
 class Onix(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Onix', 40, 'rock', 1.1, 1.05, level, [rock_throw, confuse_ray, bulldoze, tackle], name, player_owned)
+        super().__init__('Onix', 40, 'rock', 1.09, 1.07, level, [rock_throw, confuse_ray, bulldoze, tackle], name, player_owned)
         
 class Bellsprout(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Bellsprout', 34, 'grass', 1.05, 1.1, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
+        super().__init__('Bellsprout', 34, 'grass', 1.06, 1.09, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Weepinbell()
         
 class Weepinbell(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Weepinbell', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
+        super().__init__('Weepinbell', 38, 'grass', 1.09, 1.09, level, [tackle, vine_whip, confuse_ray, yawn], name, player_owned)
         
 class Oddish(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Oddish', 35, 'grass', 1.1, 1.15, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
+        super().__init__('Oddish', 35, 'grass', 1.1, 1.09, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Gloom()
         
 class Gloom(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Gloom', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
+        super().__init__('Gloom', 38, 'grass', 1.12, 1.09, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
 
 class Spearow(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Spearow', 37, 'flying', 1.1, 1.1, level, [scratch, wing_attack, confuse_ray], name, player_owned)
+        super().__init__('Spearow', 37, 'flying', 1.1, 1.09, level, [scratch, wing_attack, confuse_ray], name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Fearow()
         
 class Fearow(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Fearow', 39, 'flying', 1.15, 1.1, level, [scratch, wing_attack, confuse_ray], name, player_owned)
+        super().__init__('Fearow', 39, 'flying', 1.13, 1.08, level, [scratch, wing_attack, confuse_ray], name, player_owned)
         
 class Ekans(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Ekans', 37, 'poison', 1.15, 1.1, level, [toxic, tackle, paralyze], name, player_owned)
+        super().__init__('Ekans', 37, 'poison', 1.11, 1.09, level, [toxic, tackle, paralyze], name, player_owned)
         self.evolve_level1 = 22
         self.evolve_pokemon1 = Arbok()
         
 class Arbok(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Arbok', 39, 'poison', 1.17, 1.1, level, [toxic, tackle, paralyze], name, player_owned)
+        super().__init__('Arbok', 39, 'poison', 1.14, 1.09, level, [toxic, tackle, paralyze], name, player_owned)
         
 class Sandshrew(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Sandshrew', 36, 'ground', 1.13, 1.1, level, [scratch, bulldoze, paralyze], name, player_owned)
+        super().__init__('Sandshrew', 37, 'ground', 1.13, 1.09, level, [scratch, bulldoze, paralyze], name, player_owned)
         self.evolve_level1 = 22
         self.evolve_pokemon1 = Sandslash()
         
 class Sandslash(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Sandslash', 39, 'ground', 1.17, 1.1, level, [scratch, bulldoze, paralyze], name, player_owned)
+        super().__init__('Sandslash', 39, 'ground', 1.15, 1.09, level, [scratch, bulldoze, paralyze], name, player_owned)
         
 class Mankey(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Mankey', 36, 'fighting', 1.12, 1.16, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
+        super().__init__('Mankey', 36, 'fighting', 1.12, 1.1, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
         self.evolve_level1 = 28
         self.evolve_pokemon1 = Primeape()
         
 class Primeape(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Primeape', 40, 'fighting', 1.16, 1.12, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
+        super().__init__('Primeape', 40, 'fighting', 1.16, 1.11, level, [tackle, paralyze, rock_throw, low_kick], name, player_owned)
         
 class Zubat(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Zubat', 35, 'flying', 1.08, 1.12, level, [paralyze, tackle, wing_attack], name, player_owned)
+        super().__init__('Zubat', 35, 'flying', 1.08, 1.11, level, [paralyze, tackle, wing_attack], name, player_owned)
         self.evolve_level1 = 22
         self.evolve_pokemon1 = Golbat()
         
 class Golbat(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Golbat', 40, 'flying', 1.1, 1.11, level, [paralyze, tackle, wing_attack], name, player_owned)
+        super().__init__('Golbat', 40, 'flying', 1.1, 1.1, level, [paralyze, tackle, wing_attack], name, player_owned)
 
 class Battle:
 
@@ -610,9 +627,9 @@ class Battle:
         return damage
     
     def take_damage(self, attacker, defender, move, damage):
-        accuracy_roll = random.randint(1, 101)
-        if accuracy_roll in range(1, move.accuracy):
-            damage = round(defender.defense * damage)
+        accuracy_roll = random.randint(1, 100)
+        if accuracy_roll <= move.accuracy:
+            damage = round(defender.defense * damage * 0.9)
             if move.mtype in defender.weakness:
                 damage = round(damage * 1.5)
                 slow_type("It was super effective!")
@@ -656,7 +673,7 @@ class Battle:
             if not i.special:
                 slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Power: {i.power} | Type: {i.mtype.capitalize()} | Accuracy: {i.accuracy}")
             elif i.special:
-                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Status Effect: {i.status.capitalize()} | Accuracy: {i.accuracy}")
+                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Status: {i.status.capitalize()} | Accuracy: {i.accuracy}")
 
     def make_asleep(self, sleepee, move):
         random_num = random.randint(1, 100)
@@ -687,7 +704,6 @@ class Battle:
         random_num = random.randint(1, 100)
         if random_num <= move.accuracy:
             if not paralyzee.confused and not paralyzee.asleep and not paralyzee.paralyzed and not paralyzee.poisoned:
-                paralyzee.paralyzed_counter = 0
                 paralyzee.paralyzed = True
                 slow_type(f"{paralyzee} became paralyzed!")
             else:
@@ -770,7 +786,6 @@ class Battle:
             # paralyzed
             elif checkee.paralyzed:
                 if random_num < 60:
-                    checkee.confused = False
                     return True
                 else:
                     slow_type(f"{checkee.name} is paralyzed and couldn't attack!")
@@ -790,14 +805,7 @@ class Battle:
     def alive_check(self, pokemon):
         if pokemon.hp > 0:
             return True
-        pokemon.asleep_counter = 0
-        pokemon.confused_counter = 0
-        pokemon.poisoned_counter = 1
-        pokemon.paralyzed_counter = 0
-        pokemon.paralyzed = False
-        pokemon.poisoned = False
-        pokemon.asleep = False
-        pokemon.confused = False
+        pokemon.status_heal()
         return False
     
     def calculate_xp(self):
@@ -899,53 +907,18 @@ class Battle:
             if move.status == 'poisoned':
                 self.make_poisoned(defender, move)
 
-    def catch_sequence(self, pokeball):
-        counter = 0
-        while counter < 5:
-            slow_type("...")
-            time.sleep(0.5)
-            if random.randint(1, 100) in range(1, pokeball.power*round(self.active_enemy_pokemon.maxhp/self.active_enemy_pokemon.hp)):
-                counter += 1
-                if counter >= 5:
-                    slow_type(f"{self.active_enemy_pokemon} was caught!")
-                    time.sleep(0.5)
-                    return True
-            else:
-                slow_type(f"{self.active_enemy_pokemon} escaped the {pokeball}...")
-                time.sleep(0.5)
-                return False
-
     def use_item(self, item):
-        if item.name == "Potion":
-            slow_type("Use on which Pokemon?")
-            self.print_user_pokemon()
-            pokemon_index = get_valid_input("Enter number: ", list(range(1, len(self.user_pokemon)+1)))-1
-            pokemon_choice = self.user_pokemon[pokemon_index]
-            if pokemon_choice.hp >= pokemon_choice.maxhp:
-                slow_type(f"{pokemon_choice} is already at full health.")
-                return False
-            pokemon_choice.hp += 20
-            if pokemon_choice.hp > pokemon_choice.maxhp:
-                pokemon_choice.hp = pokemon_choice.maxhp
-            slow_type(f"{pokemon_choice} healed for 20 HP.")
-            self.print_health(pokemon_choice, user=True)
-            self.user_items.remove(item)
-            return True
-        elif item.name == "Attack Boost":
-            new_attack = round(self.active_pokemon.attack + item.power, 2)
-            slow_type(f"{self.active_pokemon}'s attack raised from {self.active_pokemon.attack} to {new_attack}!")
-            self.active_pokemon.attack = new_attack
-            self.user_items.remove(item)
-            return True
-        elif item.name == "Defense Boost":
-            new_defense = round(self.active_pokemon.defense - item.power, 2)
-            slow_type(f"{self.active_pokemon}'s defense raised from {self.active_pokemon.defense} to {new_defense}!")
-            self.active_pokemon.defense = new_defense
-            self.user_items.remove(item)
-            return True
+        if item.itype == "heal" or item.itype == "status_heal":
+            if item.use(self.user_pokemon, self.user_items):
+                return True
+            return False
+        elif item.itype == "attack" or item.itype == "defense":
+            if item.use(self.active_pokemon, self.user_items):
+                return True
+            return False
         elif item.itype == 'catch':
             if self.wild:
-                if self.catch_sequence(item):
+                if item.use(self.active_enemy_pokemon, self.user_items):
                     self.active_enemy_pokemon.player_owned=True
                     if len(self.user_pokemon) < 6:
                         nickname = input("Give it a name: ")
@@ -954,10 +927,6 @@ class Battle:
                         slow_type(f"{self.active_enemy_pokemon} was added to your party")
                     else:
                         slow_type(f"Party is full. {self.active_enemy_pokemon} was released.")
-                    self.user_items.remove(item)
-                    return True
-                else:
-                    self.user_items.remove(item)
                     return True
             else:
                 slow_type(f"You can't steal another trainer's Pokemon!")
@@ -1087,23 +1056,86 @@ class Potion(Item):
         self.id = Potion.id
         Potion.id += 1
 
+    def use(self, party, item_list):
+        new_line()
+        slow_type("Use on which Pokemon?")
+        for index, val in enumerate(party):
+            slow_type(f"{index+1}. {val}"+
+            (" (Asleep)" if val.asleep else "")+
+            (" (Poisoned)" if val.poisoned else "")+
+            (" (Paralyzed)" if val.paralyzed else "")+
+            (" (Confused)" if val.confused else ""))
+        pokemon_index = get_valid_input("Enter number: ", list(range(1, len(party)+1)))-1
+        pokemon_choice = party[pokemon_index]
+        if pokemon_choice.hp >= pokemon_choice.maxhp:
+            slow_type(f"{pokemon_choice} is already at full health.")
+            return False
+        pokemon_choice.hp += self.power
+        if pokemon_choice.hp > pokemon_choice.maxhp:
+            pokemon_choice.hp = pokemon_choice.maxhp
+        slow_type(f"{pokemon_choice} healed for {self.power} HP.")
+        item_list.remove(self)
+        return True
+
+class FullHeal(Item):
+
+    id = 1
+    def __init__(self):
+        super().__init__("Full Heal", "status_heal", 0)
+        self.cost = 75
+        self.id = Potion.id
+        FullHeal.id += 1
+
+    def use(self, party, item_list):
+        new_line()
+        slow_type("Use on which Pokemon?")
+        for index, val in enumerate(party):
+            slow_type(f"{index+1}. {val}"+
+            (" (Asleep)" if val.asleep else "")+
+            (" (Poisoned)" if val.poisoned else "")+
+            (" (Paralyzed)" if val.paralyzed else "")+
+            (" (Confused)" if val.confused else ""))
+        pokemon_index = get_valid_input("Enter number: ", list(range(1, len(party)+1)))-1
+        pokemon_choice = party[pokemon_index]
+        if not pokemon_choice.confused and not pokemon_choice.asleep and not pokemon_choice.poisoned and not pokemon_choice.paralyzed:
+            slow_type(f"{pokemon_choice} is already at full health.")
+            return False
+        pokemon_choice.status_heal()
+        slow_type(f"{pokemon_choice} was cured of status effects.")
+        item_list.remove(self)
+        return True
+
 class Attack_Boost(Item):
 
     id = 1
     def __init__(self):
-        super().__init__("Attack Boost", "attack", 0.15)
+        super().__init__("Attack Boost", "attack", 0.1)
         self.cost = 100
         self.id = Attack_Boost.id
         Attack_Boost.id += 1
+
+    def use(self, pokemon, item_list):
+        new_attack = round(pokemon + self.power, 2)
+        slow_type(f"{pokemon}'s attack was raised!")
+        pokemon.attack = new_attack
+        item_list.remove(self)
+        return True
 
 class Defense_Boost(Item):
 
     id = 1
     def __init__(self):
-        super().__init__("Defense Boost", "defense", 0.15)
+        super().__init__("Defense Boost", "defense", 0.1)
         self.cost = 100
         self.id = Defense_Boost.id
         Defense_Boost.id += 1
+
+    def use(self, pokemon, item_list):
+        new_defense = round(pokemon - self.power, 2)
+        slow_type(f"{pokemon}'s defense was raised!")
+        pokemon.defense = new_defense
+        item_list.remove(self)
+        return True
 
 class Pokeball(Item):
 
@@ -1113,6 +1145,24 @@ class Pokeball(Item):
         self.cost = 50
         self.id = Pokeball.id
         Pokeball.id += 1
+
+    def use(self, pokemon, item_list):
+        counter = 0
+        while counter < 5:
+            slow_type("...")
+            time.sleep(0.5)
+            if random.randint(1, 100) in range(1, self.power*round(pokemon.maxhp/pokemon.hp)):
+                counter += 1
+                if counter >= 5:
+                    slow_type(f"{pokemon} was caught!")
+                    time.sleep(0.5)
+                    item_list.remove(self)
+                    return True
+            else:
+                slow_type(f"{pokemon} escaped the {self}...")
+                time.sleep(0.5)
+                item_list.remove(self)
+                return False
 
 class Greatball(Item):
 
@@ -1135,13 +1185,95 @@ class Ultraball(Item):
 class Player:
 
     def __init__(self, name='Player', money=0):
+        self.tutorial_beat = False
         self.name = name
         self.money = money
         self.gym_badges= []
+        self.pokemon = []
+        self.items = []
+        self.local_location=""
+        self.map_location=""
+        self.map = ""
+        self.pokedex = {
+        Charmander(): False,
+        Bulbasaur(): False,
+        Squirtle(): False
+        }
+        self.pokedex = {pokemon: self.pokedex[pokemon] for pokemon in sorted(self.pokedex, key=lambda x: x.name)}
+        self.inventory = {
+'pokemon': self.pokemon,
+'items': self.items,
+'map': self.map,
+'money': self.money,
+'name': self.name,
+'gym_badges': self.gym_badges,
+'pokedex': self.pokedex,
+'local_location': self.local_location,
+'map_location': self.map_location
+}
 
     def initialize(self):
-        self.map_location = pallet_town
-        self.local_location = pallet_town.pokemonlab
+        try:
+            for place in map_object.map_locations:
+                if place.name == self.map_location.name:
+                    self.map_location = place
+            for place in self.map_location.local_locations:
+                if place.name == self.local_location.name:
+                    self.local_location = place
+
+        except Exception as e:
+            print(e)
+            self.map_location = pallet_town
+            self.local_location = pallet_town.pokemonlab
+
+    def update_map(self):
+        slow_type(f"""
+      Pallet Town {"(You)" if self.map_location == pallet_town else "    "}
+            V
+        Route 1
+            V
+     Viridian City {"(You)" if self.map_location == viridian_city else "    "}
+            V
+Route 2: Viridian Forest
+            V
+       Pewter City {"(You)" if self.map_location == pewter_city else "    "}
+            V
+         Route 3
+            V
+   {"(You)" if self.map_location == mount_moon else "    "} Mt Moon -----> Mt Moon Cave
+            V
+         Route 4
+            V
+      Cerulean City
+"""
+        )
+
+    def save(self, filename):
+        new_line()
+        slow_type("1. Save Game\n2. Delete Save\n3. Back")
+        choice = get_valid_input("Enter number: ", [1, 2, 3])
+        if choice == 1:
+            with open(filename, 'wb') as file:
+                pickle.dump(self, file)
+                slow_type("......", 0.25)
+                slow_type("Game Saved!")
+                time.sleep(1)
+        if choice == 2:
+            if os.path.exists('./savefile'):
+                os.remove('./savefile')
+                slow_type("......", 0.25)
+                print(f"Save has been deleted.")
+            else:
+                slow_type("No save found!")
+            time.sleep(1)
+        if choice == 3:
+            return
+
+    @classmethod
+    def load(cls, filename):
+        with open(filename, 'rb') as file:
+            loaded_player = pickle.load(file)
+        return loaded_player
 
 class Location:
 
@@ -1190,14 +1322,7 @@ class PokemonCenter(Location):
         new_line()
         for pokemon in player.pokemon:
             pokemon.hp = pokemon.maxhp
-            pokemon.confused = False
-            pokemon.asleep = False
-            pokemon.paralyzed = False
-            pokemon.poisoned = False
-            pokemon.confused_counter = 0
-            pokemon.asleep_counter = 0
-            pokemon.paralyzed_counter = 0
-            pokemon.poisoned_counter = 1
+            pokemon.status_heal()
         slow_type("......", 0.5)
         slow_type(self.string)
 
@@ -1301,12 +1426,14 @@ class Pokemart(Location):
 # pokemon gym
 class PokemonGym(Location):
 
-    def __init__(self, trainer_pokemon = [], trainer_levels = [], leader_pokemon=[], leader_name="Gym Leader", gym_name=""):
+    def __init__(self, trainer_pokemon = [], trainer_levels = [], leader_pokemon=[], leader_name="Gym Leader", gym_name="", victory_message="", gym_badge=""):
         super().__init__(gym_name)
         self.trainer_pokemon = trainer_pokemon
         self.trainer_levels = trainer_levels
         self.leader_pokemon = leader_pokemon
         self.leader_name = leader_name
+        self.victory_message = victory_message
+        self.gym_badge = gym_badge
 
     def choose(self):
         slow_type(f"1. Trainer Battle\n2. Challenge Gym Leader\n3. Return to {player.map_location}")
@@ -1344,32 +1471,35 @@ class MapLocation:
             new_location = temp_dict[choice]
             player.local_location = new_location
             return True
+        
+    def display_party(self):
+        slow_type("------------ Party ------------")
+        for pokemon in player.pokemon:
+            slow_type(f"{pokemon} | {pokemon.species} | HP: {pokemon.hp}/{pokemon.maxhp}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
+        while True:
+            slow_type("1. Switch Lead Pokemon\n2. Back")
+            if get_valid_input("Enter number: ", [1, 2]) == 1:
+                new_line()
+                for index, value in enumerate(player.pokemon):
+                    slow_type(f"{index+1}. {value}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
+                pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(player.pokemon)+1)))
+                if pokemon_choice == 1:
+                    slow_type(f"{player.pokemon[0]} is already the lead pokemon.")
+                    break
+                else:
+                    slow_type(f"{player.pokemon[pokemon_choice-1]} is now the lead pokemon.")
+                    player.pokemon[0], player.pokemon[pokemon_choice-1] = player.pokemon[pokemon_choice-1], player.pokemon[0]
+                    break
+            else:
+                break
     
     def inventory_display(self):
         while True:
             slow_type("------------ Inventory ------------")
-            slow_type(f"You have ${player.money}.\n1. Check Pokemon\n2. Check Bag\n3. Check Map\n4. Check Pokedex\n5. Back")
-            choice = get_valid_input("Enter number: ", [1, 2, 3, 4, 5])
+            slow_type(f"You have ${player.money}.\n1. Check Pokemon\n2. Check Bag\n3. Check Map\n4. Check Pokedex\n5. Save Data\n6. Back")
+            choice = get_valid_input("Enter number: ", [1, 2, 3, 4, 5, 6])
             if choice == 1:
-                slow_type("------------ Party ------------")
-                for pokemon in player.pokemon:
-                    slow_type(f"{pokemon} | {pokemon.species} | HP: {pokemon.hp}/{pokemon.maxhp}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
-                while True:
-                    if get_valid_input("1. Switch Lead Pokemon\n2. Back\nEnter number: ", [1, 2]) == 1:
-                        new_line()
-                        for index, value in enumerate(player.pokemon):
-                            slow_type(f"{index+1}. {value}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
-                        pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(player.pokemon)+1)))
-                        if pokemon_choice == 1:
-                            slow_type(f"{player.pokemon[0]} is already the lead pokemon.")
-                            break
-                        else:
-                            slow_type(f"{player.pokemon[pokemon_choice-1]} is now the lead pokemon.")
-                            player.pokemon[0], player.pokemon[pokemon_choice-1] = player.pokemon[pokemon_choice-1], player.pokemon[0]
-                            break
-                    else:
-                        break
-
+                self.display_party()
             if choice == 2:
                 slow_type("------------ Bag ------------")
                 if player.items == []:
@@ -1377,13 +1507,15 @@ class MapLocation:
                 for item in player.items:
                     slow_type(f"{item}")
             if choice == 3:
-                slow_type(player.map)
+                player.update_map()
             if choice == 4:
                 slow_type("------------ Pokedex ------------")
                 for pokemon, value in player.pokedex.items():
                     if value:
                         slow_type(f"{pokemon.species} | Type: {pokemon.ptype.capitalize()} | Weakness: {', '.join([weakness.capitalize() for weakness in pokemon.weakness])}")
             if choice == 5:
+                player.save('./savefile')
+            if choice == 6:
                 return
 
     def location_loop(self):
@@ -1435,7 +1567,7 @@ class PalletTown(MapLocation):
                     slow_type("Welcome home! I hope you enjoy your adventure.\nI got these items for you!")
                     time.sleep(0.5)
                     slow_type(f"{player.name} obtained Mom's Gifts!")
-                    player.items += [next(Potion().generate()), next(Attack_Boost().generate()), next(Defense_Boost().generate())] + [next(Pokeball().generate()) for i in range(3)]
+                    player.items += [next(Potion.generate()), next(Attack_Boost.generate()), next(Defense_Boost.generate()), next(FullHeal.generate())] + [next(Pokeball().generate()) for i in range(3)]
                     player.money += 100
                     time.sleep(1)
                     slow_type("Take care now!")
@@ -1453,7 +1585,7 @@ class ViridianCity(MapLocation):
     def __init__(self):
         super().__init__("Viridian City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball])
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_center, self.pokemart]
@@ -1466,10 +1598,8 @@ class PewterCity(MapLocation):
     def __init__(self):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
-        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym")
-        self.badge = "Rock Badge"
-        self.victory_message = f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal])
+        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_gym, self.pokemon_center, self.pokemart]
@@ -1481,10 +1611,11 @@ class MountMoon(MapLocation):
 
     def __init__(self):
         super().__init__("Mount Moon")
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal])
+        self.pokemon_center = PokemonCenter(name="Hiker's House", string="Your Pokemon should be all rested up now...\nTake care. I hear there's some cool Pokemon in the cave...")
 
     def initialize(self, *routes):
-        self.local_locations = [self.pokemart]
+        self.local_locations = [self.pokemart, self.pokemon_center]
         for route in routes:
             self.local_locations.insert(0, route)
             
@@ -1493,18 +1624,22 @@ class CeruleanCity(MapLocation):
     def __init__(self):
         super().__init__("Cerulean City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball()])
-        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [Staryu(18), Starmie(21)], "Misty", "Cerulean City Gym")
-        self.badge = "Water Badge"
-        self.victory_message = f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, Greatball])
+        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [Staryu(18), Starmie(21)], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart]
         for route in routes:
             self.local_locations.insert(0, route)
 
-# create plaayer
-player = Player(money=0)
+# create player
+player = Player(name="Player", money=0)
+try:
+    player = Player.load('./savefile')
+    slow_type(f"Loading game...")
+    time.sleep(1)
+except:
+    player = Player(money=0)
 
 # create locations
 pallet_town = PalletTown()
@@ -1514,51 +1649,25 @@ mount_moon = MountMoon()
 cerulean_city = CeruleanCity()
 
 # initializing
+trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
+
 route1 = Route([Magikarp(), Rattata(), Pidgey(), Oddish(), Bellsprout()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey(), Oddish(), Bellsprout()], name="Route 1")
 viridian_forest = Route([Weedle(), Caterpie(), Bellsprout(), Rattata(), Pikachu()], [4, 5, 6], viridian_city, pewter_city, trainer_levels=[4, 5, 6], trainer_pokemon=[Bellsprout(), Rattata(), Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
 route3 = Route([Pidgey(), Spearow(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
 mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
 route4 = Route([Ekans(), Spearow(), Sandshrew(), Mankey(), Raticate()], [10, 11, 12, 13], mount_moon, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Route 4")
+
 map_object = MapLocation("Map")
+
 map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city]
-player.initialize()
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest)
 pewter_city.initialize(viridian_forest, route3)
-mount_moon.initialize(route3, mt_moon_cave)
-trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
+mount_moon.initialize(route3, mt_moon_cave, route4)
+cerulean_city.initialize(route4)
 
-# beginning pokemon party
-
-player.pokemon = []
-player.items = []
-player.map ="""
-   Pallet Town
-        V
-     Route 1
-        V
-   Viridian City
-        V
-Route 2: Viridian Forest
-        V
-   Pewter City
-        V
-     Route 3
-        V
-     Mt Moon -----> Mt Moon Cave
-        V
-     Route 4
-        V
-  Cerulean City
-"""
-player.pokedex = {
-Charmander(): False,
-Bulbasaur(): False,
-Squirtle(): False
-}
-player.pokedex = {pokemon: player.pokedex[pokemon] for pokemon in sorted(player.pokedex, key=lambda x: x.name)}
-
-player.inventory = {'pokemon': player.pokemon, 'items': player.items}
+# intialize player location
+player.initialize()
 
 # get starter pokemon
 
@@ -1604,21 +1713,27 @@ def intro2():
 # game
 if __name__ == "__main__":
 
-    intro()
-    get_starter()
-    intro2()
-    
-    while True:
-        player.local_location = player.map_location.pokemonlab
-        if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
-            new_line()
-            slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
-            time.sleep(1)
-            break
-        else:
-            player.map_location.black_out()
-            oak_pokemon.hp = oak_pokemon.maxhp
-            new_line()
-            slow_type("Ah, you're back. Let's try that again.")
+    if not player.tutorial_beat:
 
+        intro()
+        get_starter()
+        intro2()
+        
+        while True:
+            player.local_location = player.map_location.pokemonlab
+            if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
+                new_line()
+                slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
+                time.sleep(1)
+                player.tutorial_beat = True
+                break
+            else:
+                player.map_location.black_out()
+                oak_pokemon.hp = oak_pokemon.maxhp
+                new_line()
+                slow_type("Ah, you're back. Let's try that again.")
+    try:
+        player.map_location.change_location()
+    except:
+        pass
     player.map_location.location_loop()

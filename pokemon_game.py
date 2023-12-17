@@ -106,6 +106,7 @@ class Pokemon:
         self.confused = False
         self.evolved1 = False
         self.evolved2 = False
+        self.learnable_moves = {}
         self.id = Pokemon.id
         Pokemon.id += 1
 
@@ -189,9 +190,32 @@ class Pokemon:
             slow_type(f"{self.name} gained {xp} XP. {self.xp}/100")
             while self.xp >= 100:
                 self.level_up()
-                self.asleep
+                for key, val in self.learnable_moves.items():
+                    self.learn_move(key, val)
                 self.xp -= 100
             time.sleep(0.5)
+
+
+    def learn_move(self, level, move):
+        if self.level == level:
+            time.sleep(0.5)
+            new_line()
+            if len(self.move_set) < 4:
+                slow_type(f"{self.name} learned {move}!")
+                self.move_set.append(move)
+            else:
+                slow_type(f"{self.name} is trying to learn {move}.\nDelete a move to make room?\n1. Yes\n2. No")
+                choice = get_valid_input("Enter number: ", [1, 2])
+                if choice == 1:
+                    for index, value in enumerate(self.move_set):
+                        slow_type(f"{index + 1}. {value}")
+                    move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
+                    slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
+                    time.sleep(1)
+                    slow_type(f"...and learned {move}!")
+                    self.move_set[move_index] = move
+                elif choice == 2:
+                    return
 
     def evolve(self):
         if self.evolve_level1 <= self.level and self.evolved1 == False:
@@ -244,6 +268,7 @@ class Charmander(Pokemon):
         self.evolve_pokemon1 = Charmeleon()
         self.evolve_level2 = 36
         self.evolve_pokemon2 = Charizard()
+        self.learnable_moves = {6: scratch}
 
 class Charmeleon(Pokemon):
     
@@ -341,6 +366,7 @@ class Magikarp(Pokemon):
         super().__init__('Magikarp', 38, 'water', 1, 1.15, level, [splash], name, player_owned)
         self.evolve_level1 = 20
         self.evolve_pokemon1 = Gyarados()
+        self.learnable_moves = {20: bubble, 20: tackle}
 
 class Gyarados(Pokemon):
 
@@ -844,6 +870,7 @@ class Battle:
                     main_pokemon.xp = battle_pokemon.xp
                     main_pokemon.poisoned = battle_pokemon.poisoned
                     main_pokemon.paralyzed = battle_pokemon.paralyzed
+                    main_pokemon.move_set = battle_pokemon.move_set
                     if main_pokemon.level < battle_pokemon.level:
                         main_pokemon.level = battle_pokemon.level
                         main_pokemon.update_stats(main_pokemon.level)
@@ -1332,7 +1359,7 @@ class MapLocation:
                         new_line()
                         for index, value in enumerate(player.pokemon):
                             slow_type(f"{index+1}. {value}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
-                        pokemon_choice = get_valid_input("Enter number: ", list(1, range(len(player.pokemon)+1)))
+                        pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(player.pokemon)+1)))
                         if pokemon_choice == 1:
                             slow_type(f"{player.pokemon[0]} is already the lead pokemon.")
                             break
@@ -1553,7 +1580,7 @@ def get_starter():
     slow_type(f"You chose {starters[starter_choice-1]}.")
     starter_nickname = input("Give it a nickname: ").strip()
     if starter_choice == 1:
-        player.pokemon.append(Charmander(55, name=starter_nickname, player_owned=True))
+        player.pokemon.append(Charmander(5, name=starter_nickname, player_owned=True))
         oak_pokemon = next(Bulbasaur.generate(5))
     elif starter_choice == 2:
         player.pokemon.append(Bulbasaur(5, name=starter_nickname, player_owned=True))

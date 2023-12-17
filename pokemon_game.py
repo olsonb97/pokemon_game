@@ -87,8 +87,8 @@ class Pokemon:
         self.ptype = ptype        
         self.maxhp = round(self.base_hp*(level/5))
         self.hp = self.maxhp
-        self.attack = round(self.base_attack*(level/5), 3)
-        self.defense = round(self.base_defense/(level/5), 3)
+        self.attack = round(self.base_attack*(level/5), 2)
+        self.defense = round(self.base_defense/(level/5), 2)
         self.level = level
         self.move_set = move_set
         self.name = self.species
@@ -171,8 +171,8 @@ class Pokemon:
 
     def update_stats(self, level):
         self.maxhp = round(self.base_hp*(level/5))
-        self.attack = round(self.base_attack*(level/5), 3)
-        self.defense = round(self.base_defense/(level/5), 3)
+        self.attack = round(self.base_attack*(level/5), 2)
+        self.defense = round(self.base_defense/(level/5), 2)
     
     def __repr__(self):
         return self.name
@@ -302,7 +302,7 @@ class Blastoise(Pokemon):
 class Rattata(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Rattata', 40, 'normal', 1.05, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
+        super().__init__('Rattata', 40, 'normal', 1.1, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
         self.evolve_pokemon1 = Raticate()
         self.evolve_level1 = 20
         
@@ -333,7 +333,7 @@ class Seaking(Pokemon):
 class Raticate(Pokemon):
 
     def __init__(self, level=8, name="", player_owned=False):
-        super().__init__('Raticate', 42, 'normal', 1.1, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
+        super().__init__('Raticate', 42, 'normal', 1.12, 1.05, level, [tackle, scratch, confuse_ray], name, player_owned)
 
 class Magikarp(Pokemon):
 
@@ -488,14 +488,14 @@ class Weepinbell(Pokemon):
 class Oddish(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Oddish', 35, 'grass', 1.1, 1.15, level, [tackle, vine_whip, confuse_ray], name, player_owned)
+        super().__init__('Oddish', 35, 'grass', 1.1, 1.15, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Gloom()
         
 class Gloom(Pokemon):
 
     def __init__(self, level=5, name="", player_owned=False):
-        super().__init__('Gloom', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray], name, player_owned)
+        super().__init__('Gloom', 38, 'grass', 1.1, 1.1, level, [tackle, vine_whip, confuse_ray, toxic], name, player_owned)
 
 class Spearow(Pokemon):
 
@@ -619,7 +619,7 @@ class Battle:
             
     def print_user_pokemon(self):
         for index, pokemon in enumerate(self.user_pokemon):
-            slow_type(f"{index+1}. {pokemon} HP: {pokemon.hp}/{pokemon.maxhp} LVL: {pokemon.level}"+(" (active)" if pokemon.id == self.active_pokemon.id else ""))
+            slow_type(f"{index+1}. {pokemon} HP: {pokemon.hp}/{pokemon.maxhp} LVL: {pokemon.level}"+(" (active)" if pokemon.id == self.active_pokemon.id else "") + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
 
     def print_items(self):
         for index, item in enumerate(self.user_items):
@@ -905,13 +905,13 @@ class Battle:
             self.user_items.remove(item)
             return True
         elif item.name == "Attack Boost":
-            new_attack = round(self.active_pokemon.attack + item.power, 3)
+            new_attack = round(self.active_pokemon.attack + item.power, 2)
             slow_type(f"{self.active_pokemon}'s attack raised from {self.active_pokemon.attack} to {new_attack}!")
             self.active_pokemon.attack = new_attack
             self.user_items.remove(item)
             return True
         elif item.name == "Defense Boost":
-            new_defense = round(self.active_pokemon.defense - item.power, 3)
+            new_defense = round(self.active_pokemon.defense - item.power, 2)
             slow_type(f"{self.active_pokemon}'s defense raised from {self.active_pokemon.defense} to {new_defense}!")
             self.active_pokemon.defense = new_defense
             self.user_items.remove(item)
@@ -1110,6 +1110,7 @@ class Player:
     def __init__(self, name='Player', money=0):
         self.name = name
         self.money = money
+        self.gym_badges= []
 
     def initialize(self):
         self.map_location = pallet_town
@@ -1130,21 +1131,26 @@ class Location:
         return True
 
     def trainer_battle(self, pokemons=[], levels=[]):
-        if not Battle([next(random.choice(self.trainer_pokemon).generate(random.choice(self.trainer_levels))) for i in range(1, random.randint(2, 3))], wild=False, trainer=True, trainer_name=random.choice(trainer_names), runnable=False).battle():
+        if not Battle([next(random.choice(self.trainer_pokemon).generate(random.choice(self.trainer_levels))) for i in range(2, 3)], wild=False, trainer=True, trainer_name=random.choice(trainer_names), runnable=False).battle():
             player.map_location.black_out()
             return False
         return True
 
-    def gym_battle(self, pokemon=[], name="Gym Leader"):
+    def gym_battle(self, pokemon=[], name="Gym Leader", badge='', victory_message=''):
         if not Battle(pokemon, wild=False, trainer=True, trainer_name=name, runnable=False).battle():
             player.map_location.black_out()
             for pokemon in player.map_location.pokemon_gym.leader_pokemon:
                 pokemon.hp = pokemon.maxhp
         else:
-            slow_type("You've won!")
-            time.sleep(2)
-            input("Game Over...")
-            quit()
+            time.sleep(1)
+            slow_type(f"You've defeated {name}!")
+            time.sleep(1)
+            slow_type(f"You earned the {badge}!")
+            player.gym_badges.append(badge)
+            time.sleep(0.5)
+            slow_type(victory_message)
+            time.sleep(0.5)
+            return True
 
 # pokemon center
 class PokemonCenter(Location):
@@ -1281,7 +1287,7 @@ class PokemonGym(Location):
         if choice == 1:
             self.trainer_battle(self.trainer_pokemon, self.trainer_levels)
         if choice == 2:
-            self.gym_battle(self.leader_pokemon, self.leader_name)
+            self.gym_battle(self.leader_pokemon, self.leader_name, badge=self.gym_badge, victory_message=self.victory_message)
         if choice == 3:
             return True
 
@@ -1320,12 +1326,13 @@ class MapLocation:
             if choice == 1:
                 slow_type("------------ Party ------------")
                 for pokemon in player.pokemon:
-                    slow_type(f"{pokemon} | {pokemon.species} | HP: {pokemon.hp}/{pokemon.maxhp}")
+                    slow_type(f"{pokemon} | {pokemon.species} | HP: {pokemon.hp}/{pokemon.maxhp}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
                 while True:
                     if get_valid_input("1. Switch Lead Pokemon\n2. Back\nEnter number: ", [1, 2]) == 1:
+                        new_line()
                         for index, value in enumerate(player.pokemon):
-                            slow_type(f"{index+1}. {value}")
-                        pokemon_choice = get_valid_input("Enter number: ", list(range(len(player.pokemon)+1)))
+                            slow_type(f"{index+1}. {value}" + (" (Paralyzed)" if pokemon.paralyzed else "") + (" (Poisoned)" if pokemon.poisoned else ""))
+                        pokemon_choice = get_valid_input("Enter number: ", list(1, range(len(player.pokemon)+1)))
                         if pokemon_choice == 1:
                             slow_type(f"{player.pokemon[0]} is already the lead pokemon.")
                             break
@@ -1434,6 +1441,8 @@ class PewterCity(MapLocation):
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball()])
         self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym")
+        self.badge = "Rock Badge"
+        self.victory_message = f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_gym, self.pokemon_center, self.pokemart]
@@ -1456,8 +1465,11 @@ class CeruleanCity(MapLocation):
 
     def __init__(self):
         super().__init__("Cerulean City")
+        self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion(), Attack_Boost(), Defense_Boost(), Pokeball(), Greatball()])
         self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [Staryu(18), Starmie(21)], "Misty", "Cerulean City Gym")
+        self.badge = "Water Badge"
+        self.victory_message = f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart]
@@ -1494,7 +1506,23 @@ trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "
 player.pokemon = []
 player.items = []
 player.map ="""
-Pallet Town ---> Route 1 ---> Viridian City ---> Viridian Forest ---> Pewter City ---> Route 3 ---> Mount Moon ---> Mount Moon Cave
+   Pallet Town
+        V
+     Route 1
+        V
+   Viridian City
+        V
+Route 2: Viridian Forest
+        V
+   Pewter City
+        V
+     Route 3
+        V
+     Mt Moon -----> Mt Moon Cave
+        V
+     Route 4
+        V
+  Cerulean City
 """
 player.pokedex = {
 Charmander(): False,
@@ -1525,7 +1553,7 @@ def get_starter():
     slow_type(f"You chose {starters[starter_choice-1]}.")
     starter_nickname = input("Give it a nickname: ").strip()
     if starter_choice == 1:
-        player.pokemon.append(Charmander(5, name=starter_nickname, player_owned=True))
+        player.pokemon.append(Charmander(55, name=starter_nickname, player_owned=True))
         oak_pokemon = next(Bulbasaur.generate(5))
     elif starter_choice == 2:
         player.pokemon.append(Bulbasaur(5, name=starter_nickname, player_owned=True))

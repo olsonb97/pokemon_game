@@ -363,7 +363,9 @@ class Battle:
                         main_pokemon.level = battle_pokemon.level
                         main_pokemon.update_stats(main_pokemon.level)
                         try:
-                            main_pokemon.evolve()
+                            evolved_pokemon, value = main_pokemon.evolve()
+                            if value:
+                                check_pokedex(evolved_pokemon, player)
                         except:
                             pass
                     
@@ -1183,7 +1185,7 @@ def get_starter():
     slow_type(f"You chose {starters[starter_choice-1]}.")
     starter_nickname = input("Give it a nickname: ").strip()
     if starter_choice == 1:
-        starter = Charmander(5, name=starter_nickname, moves=[ember, growl, scratch], player_owned=True)
+        starter = Charmander(15, name=starter_nickname, moves=[ember, growl, scratch], player_owned=True)
         oak_pokemon = next(Bulbasaur.generate(5))
     elif starter_choice == 2:
         starter = Bulbasaur(5, name=starter_nickname, moves=[vine_whip, growl, tackle], player_owned=True)
@@ -1192,7 +1194,7 @@ def get_starter():
         starter = Squirtle(5, name=starter_nickname, moves=[water_gun, tackle, tail_whip], player_owned=True)
         oak_pokemon = next(Charmander.generate(5, ))
     player.pokemon.append(starter)
-    check_pokedex(starter, player)
+    check_pokedex(next(starter.__class__.generate(5)), player)
     starters.pop(starter_choice-1)
     backup = starters
     new_line()

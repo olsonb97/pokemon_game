@@ -299,10 +299,10 @@ class Pokemon:
             self.base_defense = self.evolve_pokemon1.base_defense
             self.base_hp = self.evolve_pokemon1.base_hp
             self.update_stats(self.level)
-            check_pokedex(self.evolve_pokemon1, player)
             slow_type(f"{self.evolve_pokemon1} was registered in the Pokedex.")
             time.sleep(1)
             self.evolved1 = True
+            return self.evolve_pokemon1, True
         elif self.evolve_level2 <= self.level and self.evolved2 == False:
             new_line()
             slow_type(f"Your {self.name} is evolving!")
@@ -317,10 +317,10 @@ class Pokemon:
             self.base_defense = self.evolve_pokemon2.base_defense
             self.base_hp = self.evolve_pokemon2.base_hp
             self.update_stats(self.level)
-            check_pokedex(self.evolve_pokemon2, player)
             slow_type(f"{self.evolve_pokemon2} was registered in the Pokedex.")
             time.sleep(1)
             self.evolved2 = True
+            return self.evolve_pokemon2, True
 
     @classmethod
     def generate(cls, level, moves=None):

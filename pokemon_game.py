@@ -54,55 +54,55 @@ class Move:
 #'poison'
 
 # moves
-ember = Move("Ember", 'fire', 6, 90)
-water_gun = Move("Water Gun", 'water', 6, 90)
-vine_whip = Move("Vine Whip", 'grass', 6, 90)
+ember = Move("Ember", 'fire', 5.5, 90)
+water_gun = Move("Water Gun", 'water', 5.5, 90)
+vine_whip = Move("Vine Whip", 'grass', 5.5, 90)
 tackle = Move("Tackle", 'normal', 5, 100)
 yawn = Move("Yawn", 'normal', 0, 50, special=True, status='asleep')
 confuse_ray = Move("Confuse Ray", 'ghost', 0, 100, special=True, status='confused')
 supersonic = Move("Supersonic", 'normal', 0, 55, special=True, status='confused')
 thunder_wave = Move("Thunder Wave", 'electric', 0, 90, special=True, status='paralyzed')
-electro_ball = Move("Electro Ball", 'electric', 6, 100)
+electro_ball = Move("Electro Ball", 'electric', 5.5, 100)
 thunderbolt = Move("Thunderbolt", 'electric', 9, 100)
 thunder = Move("Thunder", 'electric', 11, 70)
 splash = Move("Spash", 'normal', 0, 50)
 wing_attack = Move("Wing Attack", 'flying', 7, 90)
-peck = Move("Peck", 'flying', 6, 100)
+peck = Move("Peck", 'flying', 5, 100)
 horn_attack = Move("Horn Attack", 'normal', 7, 100)
 waterfall = Move("Waterfall", 'water', 8, 100)
 megahorn = Move("Megahorn", 'bug', 11, 85)
-scratch = Move("Scratch", 'normal', 6, 95)
-spark = Move("Spark", 'normal', 7, 100)
-bulldoze = Move("Bulldoze", 'ground', 7, 85)
-confusion = Move("Confusion", 'psychic', 7, 100)
+scratch = Move("Scratch", 'normal', 5.5, 95)
+spark = Move("Spark", 'normal', 6, 100)
+bulldoze = Move("Bulldoze", 'ground', 6.5, 85)
+confusion = Move("Confusion", 'psychic', 6.5, 100)
 toxic = Move("Toxic", 'poison', 0, 80, special=True, status='poisoned')
 paralyze = Move("Paralyze", 'electric', 0, 60, special=True, status='paralyzed')
-bug_bite = Move("Bug Bite", 'bug', 6, 85)
+bug_bite = Move("Bug Bite", 'bug', 5.5, 85)
 psychic = Move("Psychic", 'psychic', 9, 90)
 shadow_ball = Move("Shadow Ball", 'ghost', 8, 90)
-rock_throw = Move("Rock Throw", 'rock', 6, 85)
+rock_throw = Move("Rock Throw", 'rock', 6.5, 85)
 low_kick = Move("Low Kick", 'fighting', 6, 90)
-aqua_tail = Move("Aqua Tail", 'water', 8, 90)
+aqua_tail = Move("Aqua Tail", 'water', 7, 90)
 flame_wheel = Move("Flame Wheel", 'fire', 7, 90)
 razor_leaf = Move("Razor Leaf", 'grass', 7, 95)
 earthquake = Move("Earthquake", 'ground', 9, 90)
-bug_buzz = Move("Bug Buzz", 'bug', 9, 90)
-aerial_ace = Move("Aerial Ace", 'flying', 9, 90)
+bug_buzz = Move("Bug Buzz", 'bug', 8, 90)
+aerial_ace = Move("Aerial Ace", 'flying', 8, 90)
 leer = Move("Leer", 'normal', 0, 100, stat='defense', stat_change=0.15, stat_target='enemy')
 tail_whip = Move("Tail Whip", 'normal', 0, 100, stat='defense', stat_change=0.15, stat_target='enemy')
 growth = Move("Growth", 'normal', 0, 100, stat='attack', stat_change=0.15, stat_target='user')
 growl = Move("Growl", 'normal', 0, 100, stat='attack', stat_change=0.15, stat_target='enemy')
 fire_fang = Move("Fire Fang", 'fire', 8, 95)
-slash = Move("Slash", 'normal', 8, 100)
+slash = Move("Slash", 'normal', 7, 100)
 flamethrower = Move("Flamethrower", 'fire', 9, 100)
 flare_blitz = Move("Flare Blitz", 'fire', 11, 60)
 nuzzle = Move("Nuzzle", 'electric', 5, 100)
 poison_powder = Move("Poison Powder", 'poison', 0, 75, special=True, status='poisoned')
 sleep_powder = Move("Sleep Powder", 'normal', 0, 75, special=True, status='asleep')
-seed_bomb = Move("Seed Bomb", 'grass', 9, 100)
+seed_bomb = Move("Seed Bomb", 'grass', 8, 100)
 power_whip = Move("Power Whip", 'grass', 11, 60)
 rapid_spin = Move("Rapid Spin", 'normal', 7, 100)
-water_pulse = Move("Water Pulse", 'water', 8, 100)
+water_pulse = Move("Water Pulse", 'water', 7, 100)
 shell_smash = Move("Shell Smash", 'normal', 0, 100, stat='defense', stat_change=0.2, stat_target='enemy')
 iron_defense = Move("Iron Defense", 'normal', 0, 100, stat='defense', stat_change=0.2, stat_target='user')
 hydro_pump = Move("Hydro Pump", 'water', 11, 60)
@@ -176,7 +176,7 @@ class Pokemon:
         if ptype == 'flying':
             self.weakness = ['rock', 'electric', 'ice']
         if ptype == 'bug':
-            self.weakness = ['flying', 'poison', 'rock']
+            self.weakness = ['flying', 'poison', 'rock', 'fire']
         if ptype == 'ghost':
             self.weakness = ['ghost']
         if ptype == 'ice':
@@ -340,14 +340,15 @@ class Pokemon:
             self.evolved2 = True
 
     @classmethod
-    def generate(cls, level):
-        moves = cls.generate_moves(level)
+    def generate(cls, level, moves=None):
+        if moves is None:
+            moves = cls.generate_moves(level)
         yield cls(level=level, moves=moves)
 
 # pokemon subclasses
 class Charmander(Pokemon):
 
-    learnable_moves = {1: [growl, scratch], 6: [ember], 16: [fire_fang], 20: [slash], 24: [flamethrower], 36: [flare_blitz]}
+    learnable_moves = {1: [growl, scratch], 4: [ember], 16: [fire_fang], 20: [slash], 24: [flamethrower], 36: [flare_blitz]}
     
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Charmander', 35, 'fire', 1.09, 1.11, level, moves, name, player_owned)
@@ -374,10 +375,10 @@ class Charizard(Pokemon):
 
 class Bulbasaur(Pokemon):
 
-    learnable_moves = {1: [growl, tackle], 6: [vine_whip], 7: [confuse_ray], 15: [poison_powder], 15: [sleep_powder], 18: [seed_bomb], 33: [power_whip]}
+    learnable_moves = {1: [growl, tackle], 4: [vine_whip], 7: [confuse_ray], 15: [poison_powder], 15: [sleep_powder], 18: [seed_bomb], 33: [power_whip]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Bulbasaur', 40, 'grass', 1.05, 1.07, level, moves, name, player_owned)
+        super().__init__('Bulbasaur', 40, 'grass', 1.07, 1.08, level, moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Ivysaur()
         self.evolve_level2 = 32
@@ -388,7 +389,7 @@ class Ivysaur(Pokemon):
     learnable_moves = Bulbasaur.learnable_moves
 
     def __init__(self, level=8, name='', moves=None, player_owned=False):
-        super().__init__('Ivysaur', 43, 'grass', 1.08, 1.06, level, moves, name, player_owned)
+        super().__init__('Ivysaur', 43, 'grass', 1.08, 1.07, level, moves, name, player_owned)
         self.evolve_level1 = 32
         self.evolve_pokemon1 = Venusaur()
 
@@ -397,14 +398,14 @@ class Venusaur(Pokemon):
     learnable_moves = Bulbasaur.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Venusaur', 45, 'grass', 1.11, 1.05, level, moves, name, player_owned)
+        super().__init__('Venusaur', 44, 'grass', 1.11, 1.06, level, moves, name, player_owned)
     
 class Squirtle(Pokemon):
 
-    learnable_moves = {1: [tackle, tail_whip], 6: [water_gun], 9: [rapid_spin], 15: [water_pulse], 24: [aqua_tail], 27: [shell_smash], 30: [iron_defense], 33: [hydro_pump]}
+    learnable_moves = {1: [tackle, tail_whip], 4: [water_gun], 9: [rapid_spin], 15: [water_pulse], 24: [aqua_tail], 27: [shell_smash], 30: [iron_defense], 33: [hydro_pump]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Squirtle', 38, 'water', 1.05, 1.09, level, moves, name, player_owned)
+        super().__init__('Squirtle', 38, 'water', 1.08, 1.09, level, moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Wartortle()
         self.evolve_level2 = 32
@@ -415,7 +416,7 @@ class Wartortle(Pokemon):
     learnable_moves = Squirtle.learnable_moves
 
     def __init__(self, level=8, name='', moves=None, player_owned=False):
-        super().__init__('Wartortle', 42, 'water', 1.07, 1.09, level, moves, name, player_owned)
+        super().__init__('Wartortle', 42, 'water', 1.08, 1.09, level, moves, name, player_owned)
         self.evolve_level1 = 32
         self.evolve_pokemon1 = Blastoise()
 
@@ -424,14 +425,14 @@ class Blastoise(Pokemon):
     learnable_moves = Squirtle.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Blastoise', 42, 'water', 1.11, 1.06, level, moves, name, player_owned)
+        super().__init__('Blastoise', 42, 'water', 1.11, 1.08, level, moves, name, player_owned)
 
 class Rattata(Pokemon):
 
     learnable_moves = {1: [tackle, tail_whip], 8: [scratch], 20: [slash]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Rattata', 40, 'normal', 1.06, 1.11, level, moves, name, player_owned)
+        super().__init__('Rattata', 40, 'normal', 1.08, 1.11, level, moves, name, player_owned)
         self.evolve_pokemon1 = Raticate()
         self.evolve_level1 = 20
 
@@ -456,7 +457,7 @@ class Starmie(Pokemon):
     learnable_moves = Staryu.learnable_moves
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Starmie', 41, 'water', 1.13, 1.06, level, moves, name, player_owned)
+        super().__init__('Starmie', 41, 'water', 1.12, 1.07, level, moves, name, player_owned)
         
 class Goldeen(Pokemon):
 
@@ -516,14 +517,14 @@ class Butterfree(Pokemon):
     learnable_moves = Caterpie.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Butterfree', 41, 'bug', 1.09, 1.06, level, moves, name, player_owned)
+        super().__init__('Butterfree', 41, 'bug', 1.09, 1.08, level, moves, name, player_owned)
 
 class Vulpix(Pokemon):
 
     learnable_moves = {1: [ember, tail_whip], 10: [flame_wheel], 20: [confuse_ray], 32: [flamethrower], 45: [flare_blitz]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Vulpix', 38, 'fire', 1.09, 1.06, level, moves, name, player_owned)
+        super().__init__('Vulpix', 38, 'fire', 1.09, 1.09, level, moves, name, player_owned)
 
 class Pidgey(Pokemon):
 
@@ -577,7 +578,7 @@ class Beedrill(Pokemon):
     learnable_moves = Weedle.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Beedrill', 41, 'bug', 1.09, 1.06, level, moves, name, player_owned)
+        super().__init__('Beedrill', 41, 'bug', 1.09, 1.1, level, moves, name, player_owned)
 
 class Pikachu(Pokemon):
 
@@ -616,7 +617,7 @@ class Marowak(Pokemon):
     learnable_moves = {1: [growl, tackle]}
 
     def __init__(self, level=8, name='', moves=None, player_owned=False):
-        super().__init__('Marowak', 42, 'ground', 1.14, 1.1, level, moves, name, player_owned)
+        super().__init__('Marowak', 42, 'ground', 1.13, 1.1, level, moves, name, player_owned)
 
 class Magnemite(Pokemon):
 
@@ -662,7 +663,7 @@ class Bellsprout(Pokemon):
     learnable_moves = {1: [growl, tackle]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Bellsprout', 35, 'grass', 1.06, 1.09, level, moves, name, player_owned)
+        super().__init__('Bellsprout', 35, 'grass', 1.07, 1.09, level, moves, name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Weepinbell()
         
@@ -719,7 +720,7 @@ class Arbok(Pokemon):
     learnable_moves = {1: [growl, tackle]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Arbok', 39, 'poison', 1.14, 1.09, level, moves, name, player_owned)
+        super().__init__('Arbok', 39, 'poison', 1.12, 1.09, level, moves, name, player_owned)
         
 class Sandshrew(Pokemon):
 
@@ -735,7 +736,7 @@ class Sandslash(Pokemon):
     learnable_moves = {1: [growl, tackle]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Sandslash', 39, 'ground', 1.15, 1.09, level, moves, name, player_owned)
+        super().__init__('Sandslash', 39, 'ground', 1.13, 1.09, level, moves, name, player_owned)
         
 class Mankey(Pokemon):
 
@@ -751,7 +752,7 @@ class Primeape(Pokemon):
     learnable_moves = {1: [growl, tackle]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Primeape', 40, 'fighting', 1.16, 1.11, level, moves, name, player_owned)
+        super().__init__('Primeape', 40, 'fighting', 1.14, 1.11, level, moves, name, player_owned)
         
 class Zubat(Pokemon):
 
@@ -797,14 +798,14 @@ class Battle:
             return slow_type(f"Wild {self.active_enemy_pokemon.name} appeared!")
         return slow_type(f"{self.trainer_name} challenges you to a battle!\n{self.trainer_name} sent out {self.active_enemy_pokemon.name}!")
 
-    def get_damage(self, attacker, move):
-        damage = round(attacker.attack * move.power)
+    def get_damage(self, attacker, defender, move):
+        damage = round((attacker.attack) * move.power * (defender.defense))
         return damage
     
     def take_damage(self, attacker, defender, move, damage):
         accuracy_roll = random.randint(1, 100)
         if accuracy_roll <= move.accuracy:
-            damage = round(defender.defense * damage * 0.9)
+            damage = round(damage)
             if move.mtype in defender.weakness:
                 damage = round(damage * 1.5)
                 slow_type("It was super effective!")
@@ -903,14 +904,14 @@ class Battle:
     def change_stat(self, move, attacker, defender):
         if move.stat == 'attack':
             if move.stat_target == 'user':
-                if attacker.attack_counter <= 3:
+                if attacker.attack_counter <= 2:
                     attacker.attack += move.stat_change
                     attacker.attack_counter += 1
                     slow_type(f"{attacker}'s attack was raised.")
                 else:
                     slow_type(f"{attacker}'s attack won't go any higher.")
             elif move.stat_target == 'enemy':
-                if defender.attack_counter >= -3:
+                if defender.attack_counter >= -2:
                     defender.attack -= move.stat_change
                     defender.attack_counter -= 1
                     slow_type(f"{defender}'s attack was lowered.")
@@ -918,14 +919,14 @@ class Battle:
                     slow_type(f"{defender}'s attack won't go any lower.")
         elif move.stat == 'defense':
             if move.stat_target == 'user':
-                if attacker.defense_counter <= 3:
+                if attacker.defense_counter <= 2:
                     attacker.defense -= move.stat_change
                     attacker.defense_counter += 1
                     slow_type(f"{attacker}'s defense was raised.")
                 else:
                     slow_type(f"{attacker}'s defense won't go any higher.")
             elif move.stat_target == 'enemy':
-                if defender.defense_counter >= -3:
+                if defender.defense_counter >= -2:
                     defender.defense += move.stat_change
                     defender.defense_counter -= 1
                     slow_type(f"{defender}'s defense was lowered.")
@@ -1104,7 +1105,7 @@ class Battle:
     
     def attack_turn(self, attacker, defender, move):
         if not move.special and move.stat == None:
-            damage = self.get_damage(attacker, move)*(attacker.level/5)
+            damage = self.get_damage(attacker, defender, move)
             self.take_damage(attacker, defender, move, damage)
             if attacker == self.active_pokemon:
                 self.print_health(self.active_enemy_pokemon, enemy=True)
@@ -1921,14 +1922,14 @@ def get_starter():
     slow_type(f"You chose {starters[starter_choice-1]}.")
     starter_nickname = input("Give it a nickname: ").strip()
     if starter_choice == 1:
-        player.pokemon.append(Charmander(5, name=starter_nickname, moves=Charmander.generate_moves(5), player_owned=True))
+        player.pokemon.append(Charmander(5, name=starter_nickname, moves=[ember, growl, scratch], player_owned=True))
         oak_pokemon = next(Bulbasaur.generate(5))
     elif starter_choice == 2:
-        player.pokemon.append(Bulbasaur(5, name=starter_nickname, moves=Bulbasaur.generate_moves(5), player_owned=True))
+        player.pokemon.append(Bulbasaur(5, name=starter_nickname, moves=[vine_whip, growl, tackle], player_owned=True))
         oak_pokemon = next(Squirtle.generate(5))
     elif starter_choice == 3:
-        player.pokemon.append(Squirtle(5, name=starter_nickname, moves=Squirtle.generate_moves(5), player_owned=True))
-        oak_pokemon = next(Charmander.generate(5))
+        player.pokemon.append(Squirtle(5, name=starter_nickname, moves=[water_gun, tackle, tail_whip], player_owned=True))
+        oak_pokemon = next(Charmander.generate(5, ))
     for pokemon1, value in player.pokedex.items():
         for pokemon2 in player.pokemon:
             if pokemon1.species == pokemon2.species:

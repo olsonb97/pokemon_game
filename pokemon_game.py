@@ -52,6 +52,7 @@ class Battle:
         for pokemon in self.user_pokemon:
             pokemon.attack_counter = 0
             pokemon.defense_counter = 0
+        for pokemon in self.user_pokemon:
             if pokemon.hp > 0:
                 self.active_pokemon = pokemon
                 break
@@ -64,14 +65,14 @@ class Battle:
             return slow_type(f"Wild {self.active_enemy_pokemon.name} appeared!")
         return slow_type(f"{self.trainer_name} challenges you to a battle!\n{self.trainer_name} sent out {self.active_enemy_pokemon.name}!")
 
-    def get_damage(self, attacker, defender, move):
-        damage = round((attacker.attack) * move.power * (defender.defense))
+    def get_damage(self, attacker, move):
+        damage = round(attacker.attack * move.power)
         return damage
     
     def take_damage(self, attacker, defender, move, damage):
         accuracy_roll = random.randint(1, 100)
         if accuracy_roll <= move.accuracy:
-            damage = round(damage)
+            damage = round(defender.defense * damage)
             if move.mtype in defender.weakness:
                 damage = round(damage * 1.5)
                 slow_type("It was super effective!")
@@ -373,7 +374,7 @@ class Battle:
     
     def attack_turn(self, attacker, defender, move):
         if not move.special and move.stat == None:
-            damage = self.get_damage(attacker, defender, move)
+            damage = self.get_damage(attacker, move)*(attacker.level/5)
             self.take_damage(attacker, defender, move, damage)
             if attacker == self.active_pokemon:
                 self.print_health(self.active_enemy_pokemon, enemy=True)
@@ -989,13 +990,14 @@ class MapLocation:
                 self.display_party()
             elif choice == 2:
                 slow_type("------------ Bag ------------")
+                slow_type(f"Badges: {'None' if len(player.gym_badges) == 0 else ', '.join(player.gym_badges)}")
                 if player.items == []:
                     slow_type("No items left.")
                 else:
                     for index, item in enumerate(player.items):
                         slow_type(f"{index+1}. {item}")
                     slow_type(f"{len(player.items)+1}. Back")
-                    choice = get_valid_input("Enter number: ", list(range(1, len(player.items)+1)))
+                    choice = get_valid_input("Enter number: ", list(range(1, len(player.items)+2)))
                     if choice <= len(player.items):
                         if player.items[choice-1].itype == 'heal' or player.items[choice-1].itype == 'status_heal':
                             player.items[choice-1].use(player.pokemon, player.items)
@@ -1007,9 +1009,10 @@ class MapLocation:
                 player.update_map()
             elif choice == 4:
                 slow_type("------------ Pokedex ------------")
+                player.pokedex = {k: player.pokedex[k] for k in sorted(player.pokedex, key=lambda x: x.species)}
                 for pokemon, value in player.pokedex.items():
                     if value:
-                        slow_type(f"{pokemon.species} | Type: {pokemon.ptype.capitalize()} | Weakness: {', '.join([weakness.capitalize() for weakness in pokemon.weakness])}")
+                        slow_type(f"{pokemon.species} | Type: {pokemon.ptype.capitalize()} | Weakness: {', '.join([weakness.capitalize() for weakness in pokemon.weakness])}", 0.001)
             elif choice == 5:
                 player.save('./savefile')
             elif choice == 6:
@@ -1095,7 +1098,7 @@ class PewterCity(MapLocation):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal])
-        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [Geodude(8), Onix(12)], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge")
+        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [next(Geodude.generate(8)), next(Onix.generate(12))], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_gym, self.pokemon_center, self.pokemart]
@@ -1121,7 +1124,7 @@ class CeruleanCity(MapLocation):
         super().__init__("Cerulean City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, Greatball])
-        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [Staryu(18), Starmie(21)], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge")
+        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [next(Staryu.generate(18)), next(Starmie.generate(21))], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart]
@@ -1185,7 +1188,7 @@ def get_starter():
     slow_type(f"You chose {starters[starter_choice-1]}.")
     starter_nickname = input("Give it a nickname: ").strip()
     if starter_choice == 1:
-        starter = Charmander(15, name=starter_nickname, moves=[ember, growl, scratch], player_owned=True)
+        starter = Charmander(5, name=starter_nickname, moves=[ember, growl, scratch], player_owned=True)
         oak_pokemon = next(Bulbasaur.generate(5))
     elif starter_choice == 2:
         starter = Bulbasaur(5, name=starter_nickname, moves=[vine_whip, growl, tackle], player_owned=True)

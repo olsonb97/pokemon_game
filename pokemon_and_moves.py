@@ -243,9 +243,8 @@ class Pokemon:
                 if len(self.move_set) < 4:
                     slow_type(f"{self.name} learned {move}!")
                     self.move_set.append(move)
-                    time.sleep(0.5)
+                    time.sleep(1)
                 else:
-                    new_line()
                     slow_type(f"{self.name} is trying to learn {move}.\nDelete a move to make room?\n1. Yes\n2. No")
                     choice = get_valid_input("Enter number: ", [1, 2])
                     if choice == 1:
@@ -334,7 +333,7 @@ class Charmander(Pokemon):
     learnable_moves = {1: [growl, scratch], 4: [ember], 16: [fire_fang], 20: [slash], 24: [flamethrower], 36: [flare_blitz]}
     
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Charmander', 35, 'fire', 1.09, 1.11, level, moves, name, player_owned)
+        super().__init__('Charmander', 35, 'fire', 1.08, 1.11, level, moves, name, player_owned)
         self.evolve_level1 = 16
         self.evolve_pokemon1 = Charmeleon()
         self.evolve_level2 = 36
@@ -345,7 +344,7 @@ class Charmeleon(Pokemon):
     learnable_moves = Charmander.learnable_moves
     
     def __init__(self, level=8, name='', moves=None, player_owned=False):
-        super().__init__('Charmeleon', 40, 'fire', 1.1, 1.11, level, moves, name, player_owned)
+        super().__init__('Charmeleon', 40, 'fire', 1.095, 1.11, level, moves, name, player_owned)
         self.evolve_level1 = 36
         self.evolve_pokemon1 = Charizard()
 
@@ -354,7 +353,7 @@ class Charizard(Pokemon):
     learnable_moves = Charmander.learnable_moves
     
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Charizard', 45, 'fire', 1.13, 1.11, level, moves, name, player_owned)
+        super().__init__('Charizard', 45, 'fire', 1.12, 1.11, level, moves, name, player_owned)
 
 class Bulbasaur(Pokemon):
 
@@ -399,7 +398,7 @@ class Wartortle(Pokemon):
     learnable_moves = Squirtle.learnable_moves
 
     def __init__(self, level=8, name='', moves=None, player_owned=False):
-        super().__init__('Wartortle', 42, 'water', 1.08, 1.09, level, moves, name, player_owned)
+        super().__init__('Wartortle', 42, 'water', 1.085, 1.09, level, moves, name, player_owned)
         self.evolve_level1 = 32
         self.evolve_pokemon1 = Blastoise()
 
@@ -408,7 +407,7 @@ class Blastoise(Pokemon):
     learnable_moves = Squirtle.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Blastoise', 42, 'water', 1.11, 1.08, level, moves, name, player_owned)
+        super().__init__('Blastoise', 42, 'water', 1.115, 1.08, level, moves, name, player_owned)
 
 class Rattata(Pokemon):
 
@@ -723,7 +722,7 @@ class Sandslash(Pokemon):
         
 class Mankey(Pokemon):
 
-    learnable_moves = {1: [growl, tackle]}
+    learnable_moves = {1: [growl, tackle], 11: [low_kick]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Mankey', 37, 'fighting', 1.12, 1.1, level, moves, name, player_owned)

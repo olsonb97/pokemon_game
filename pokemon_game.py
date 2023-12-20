@@ -373,14 +373,14 @@ class Battle:
         player.items = self.user_items
     
     def attack_turn(self, attacker, defender, move):
-        if not move.special and move.stat == None:
-            damage = self.get_damage(attacker, move)*(attacker.level/5)
+        damage = self.get_damage(attacker, move)*(attacker.level/5)
+        if move.power > 0:
             self.take_damage(attacker, defender, move, damage)
-            if attacker == self.active_pokemon:
-                self.print_health(self.active_enemy_pokemon, enemy=True)
-            elif attacker == self.active_enemy_pokemon:
-                self.print_health(self.active_pokemon, user=True)
-        elif move.special:
+        if attacker == self.active_pokemon:
+            self.print_health(self.active_enemy_pokemon, enemy=True)
+        elif attacker == self.active_enemy_pokemon:
+            self.print_health(self.active_pokemon, user=True)
+        if move.special:
             if move.status == 'asleep':
                 self.make_asleep(defender, move)
             if move.status == 'confused':
@@ -389,7 +389,7 @@ class Battle:
                 self.make_paralyzed(defender, move)
             if move.status == 'poisoned':
                 self.make_poisoned(defender, move)
-        elif move.stat is not None:
+        if move.stat is not None:
             self.change_stat(move, attacker, defender)
 
     def use_item(self, item):
@@ -784,18 +784,21 @@ class Location:
         return True
 
     def gym_battle(self, pokemon=[], name="Gym Leader", badge='', victory_message=''):
-        if not Battle(pokemon, wild=False, trainer=True, trainer_name=name, runnable=False).battle():
-            player.map_location.black_out()
-
+        if not badge in player.gym_badges:
+            if not Battle(pokemon, wild=False, trainer=True, trainer_name=name, runnable=False).battle():
+                player.map_location.black_out()
+            else:
+                time.sleep(1)
+                slow_type(f"You've defeated {name}!")
+                time.sleep(1)
+                slow_type(f"You earned the {badge}!")
+                player.gym_badges.append(badge)
+                time.sleep(0.5)
+                slow_type(victory_message)
+                time.sleep(0.5)
+                return True
         else:
-            time.sleep(1)
-            slow_type(f"You've defeated {name}!")
-            time.sleep(1)
-            slow_type(f"You earned the {badge}!")
-            player.gym_badges.append(badge)
-            time.sleep(0.5)
-            slow_type(victory_message)
-            time.sleep(0.5)
+            slow_type("You've already defeated this gym!")
             return True
 
 # pokemon center
@@ -1127,7 +1130,33 @@ class CeruleanCity(MapLocation):
         self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [next(Staryu.generate(18)), next(Starmie.generate(21))], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge")
 
     def initialize(self, *routes):
-        self.local_locations = [self.pokemart]
+        self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+class SaffronCity(MapLocation):
+
+    def __init__(self):
+        super().__init__("Saffron City")
+        self.pokemon_center = PokemonCenter()
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, Greatball])
+        self.pokemon_gym = PokemonGym([Psyduck(), MrMime(), Kadabra()], [31,32,33,34,35,36], [next(Kadabra.generate(38)), next(MrMime.generate(37)), next(Venomoth.generate(38)), next(Alakazam.generate(43))], "Sabrina", "Saffron City Gym", (f"Congratulations, {player.name}. You psyched me out there.\nEnjoy your journey."), "Psychic Badge")
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+class VermillionCity(MapLocation):
+
+    def __init__(self):
+        super().__init__("Vermillion City")
+        self.pokemon_center = PokemonCenter()
+        self.pokemart = Pokemart([Potion, FullHeal(), Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball()])
+        self.pokemon_gym = PokemonGym([Voltorb(), Pikachu(), Magnemite()], [18,19,20,21,22], [next(Voltorb.generate(21)), next(Pikachu.generate(18)), next(Raichu.generate(24))], "Lt. Surge", "Vermillion City Gym", (f"Wow, {player.name}! That was shocking!\nHave an electrifying journey!"), "Electric Badge")
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
         for route in routes:
             self.local_locations.insert(0, route)
 
@@ -1146,24 +1175,30 @@ viridian_city = ViridianCity()
 pewter_city = PewterCity()
 mount_moon = MountMoon()
 cerulean_city = CeruleanCity()
+saffron_city = SaffronCity()
+vermillion_city = VermillionCity()
 
 # initializing
 trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
 
 route1 = Route([Rattata(), Pidgey(), Oddish(), Bellsprout()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey(), Oddish(), Bellsprout()], name="Route 1")
 viridian_forest = Route([Weedle(), Caterpie(), Bellsprout(), Rattata(), Pikachu()], [4, 5, 6], viridian_city, pewter_city, trainer_levels=[4, 5, 6], trainer_pokemon=[Bellsprout(), Rattata(), Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
-route3 = Route([Pidgey(), Spearow(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
+route3 = Route([Pidgey(), Spearow(), Goldeen(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
 mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
 route4 = Route([Ekans(), Spearow(), Sandshrew(), Mankey(), Raticate()], [10, 11, 12, 13], mount_moon, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Route 4")
+route5 = Route([Oddish(), Pidgey(), Meowth(), Psyduck(), Ekans(), Mankey()], [10, 11, 12, 13], saffron_city, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans()], name="Route 5")
+route6 = Route([Pidgey(), Psyduck(), Mankey(), Pikachu(), Meowth(), Abra(), Pidgeotto()], [13, 14, 15, 16], saffron_city, trainer_levels=[14, 15, 16, 17], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans(), Kadabra()], name="Route 6")
 
 map_object = MapLocation("Map")
 
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city]
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city]
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest)
 pewter_city.initialize(viridian_forest, route3)
 mount_moon.initialize(route3, mt_moon_cave, route4)
-cerulean_city.initialize(route4)
+cerulean_city.initialize(route4, route5)
+saffron_city.initialize(route5, route6)
+vermillion_city.initialize(route6)
 
 # intialize player location
 player.initialize()
@@ -1217,7 +1252,6 @@ if __name__ == "__main__":
         intro2()
         
         while True:
-            player.local_location = player.map_location.pokemonlab
             if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
                 new_line()
                 slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")

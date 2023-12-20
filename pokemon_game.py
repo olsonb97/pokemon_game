@@ -5,7 +5,7 @@ import pickle
 import os
 from pokemon_and_moves import *
 
-def slow_type(text, delay=0.005):
+def slow_type(text, delay=0.008):
 
     for char in text:
         print(char, end='', flush=True)
@@ -1100,7 +1100,7 @@ class PewterCity(MapLocation):
     def __init__(self):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal])
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball])
         self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [next(Geodude.generate(8)), next(Onix.generate(12))], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge")
 
     def initialize(self, *routes):
@@ -1113,7 +1113,7 @@ class MountMoon(MapLocation):
 
     def __init__(self):
         super().__init__("Mount Moon")
-        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal])
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball])
         self.pokemon_center = PokemonCenter(name="Hiker's House", string="Your Pokemon should be all rested up now...\nTake care. I hear there's some cool Pokemon in the cave...")
 
     def initialize(self, *routes):
@@ -1126,7 +1126,7 @@ class CeruleanCity(MapLocation):
     def __init__(self):
         super().__init__("Cerulean City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, Greatball])
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal, Greatball])
         self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [next(Staryu.generate(18)), next(Starmie.generate(21))], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge")
 
     def initialize(self, *routes):
@@ -1134,26 +1134,47 @@ class CeruleanCity(MapLocation):
         for route in routes:
             self.local_locations.insert(0, route)
 
+    class 
+
 class SaffronCity(MapLocation):
 
     def __init__(self):
         super().__init__("Saffron City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, Greatball])
-        self.pokemon_gym = PokemonGym([Psyduck(), MrMime(), Kadabra()], [31,32,33,34,35,36], [next(Kadabra.generate(38)), next(MrMime.generate(37)), next(Venomoth.generate(38)), next(Alakazam.generate(43))], "Sabrina", "Saffron City Gym", (f"Congratulations, {player.name}. You psyched me out there.\nEnjoy your journey."), "Psychic Badge")
+        self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal, Greatball])
+        self.pokemon_gym = SaffronCity.SaffronCityGym([Psyduck(), MrMime(), Kadabra()], [31,32,33,34,35,36], [next(Kadabra.generate(38)), next(MrMime.generate(37)), next(Venomoth.generate(38)), next(Alakazam.generate(43))], "Sabrina", "Saffron City Gym", (f"Congratulations, {player.name}. You psyched me out there.\nEnjoy your journey."), "Psychic Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
         for route in routes:
             self.local_locations.insert(0, route)
+    
+    class SaffronCityGym(PokemonGym):
+
+        def __init__(self, trainer_pokemon = [], trainer_levels = [], leader_pokemon=[], leader_name="Gym Leader", gym_name="", victory_message="", gym_badge=""):
+            super().__init__(trainer_pokemon, trainer_levels, leader_pokemon, leader_name, gym_name, victory_message, gym_badge)
+
+        def choose(self):
+            if "Electric Badge" in player.gym_badges:
+                slow_type(f"1. Trainer Battle\n2. Challenge Gym Leader\n3. Return to {player.map_location}")
+                choice = get_valid_input("Enter number: ", [1, 2, 3])
+                if choice == 1:
+                    self.trainer_battle(self.trainer_pokemon, self.trainer_levels)
+                if choice == 2:
+                    self.gym_battle(self.leader_pokemon, self.leader_name, badge=self.gym_badge, victory_message=self.victory_message)
+                if choice == 3:
+                    return True
+            else:
+                slow_type("Hey buddy! The gym is closed right now.\nI think Vermillion City's is open, though.\nYou can get there by taking Route 6.")
+                time.sleep(0.5)
 
 class VermillionCity(MapLocation):
 
     def __init__(self):
         super().__init__("Vermillion City")
         self.pokemon_center = PokemonCenter()
-        self.pokemart = Pokemart([Potion, FullHeal(), Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball()])
-        self.pokemon_gym = PokemonGym([Voltorb(), Pikachu(), Magnemite()], [18,19,20,21,22], [next(Voltorb.generate(21)), next(Pikachu.generate(18)), next(Raichu.generate(24))], "Lt. Surge", "Vermillion City Gym", (f"Wow, {player.name}! That was shocking!\nHave an electrifying journey!"), "Electric Badge")
+        self.pokemart = Pokemart([Potion, FullHeal, Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball])
+        self.pokemon_gym = PokemonGym([Voltorb(), Pikachu(), Magnemite()], [18,19,20,21,22], [next(Voltorb.generate(21)), next(Pikachu.generate(18)), next(Raichu.generate(24))], "Lt. Surge", "Vermillion City Gym", (f"Wow, {player.name}! Well, that was shocking!\nEnjoy the rest of your electrifying journey!"), "Electric Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
@@ -1210,10 +1231,12 @@ starters = ['Charmander', 'Bulbasaur', 'Squirtle']
 # starting functions
 def intro():
     global player
-    slow_type("Welcome to the world of Pokemon!\nWhat is your name?.")
+    slow_type("Welcome to the world of Pokemon!\nI'm Professor Oak.\nAnd, what is your name?.")
+    time.sleep(1)
     name = input("Enter: ").strip()
     player.name = name
-    slow_type(f"Nice to meet you, {player.name}. I'm Professor Oak.\nLet's get started with you choosing your Pokemon.")
+    slow_type(f"Nice to meet you, {player.name}. In the world of Pokemon, we train our\nPokemon companions for battle.\nLet's get started with you choosing your Pokemon!")
+    time.sleep(1)
     new_line()
 
 def get_starter():
@@ -1238,8 +1261,8 @@ def get_starter():
     new_line()
 
 def intro2():
-    slow_type("Now, let's have our first battle.")
-    time.sleep(0.5)
+    slow_type("Now, allow me to show you what it's all about.\nLet's have our first battle.")
+    time.sleep(1)
     slow_type("I challenge you!")
 
 # game

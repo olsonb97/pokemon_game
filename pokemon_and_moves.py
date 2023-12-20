@@ -1,7 +1,7 @@
 import random
 import time
 
-def slow_type(text, delay=0.005):
+def slow_type(text, delay=0.008):
 
     for char in text:
         print(char, end='', flush=True)

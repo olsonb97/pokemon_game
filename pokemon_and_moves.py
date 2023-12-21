@@ -274,8 +274,8 @@ class Pokemon:
             time.sleep(0.5)
 
 
-    def learn_move(self, level, moves):
-        if self.level == level:
+    def learn_move(self, level=0, moves=[], itype=False):
+        if self.level == level or itype == "tm":
             time.sleep(0.5)
             new_line()
             for move in moves:

@@ -68,7 +68,7 @@ class Battle:
     def get_damage(self, attacker, move):
         damage = round(attacker.attack * move.power)
         if move.mtype == attacker.ptype:
-            damage = damage*1.2
+            damage *= 1.1
         return damage
     
     def take_damage(self, attacker, defender, move, damage):
@@ -718,8 +718,9 @@ class Player:
 
         except Exception as e:
             #TESTINGTESTINGTESTING
-            self.map_location = pallet_town
-            self.local_location = pallet_town.pokemonlab
+            self.map_location = celadon_city
+            self.local_location = celadon_city.arcade
+            self.money = 500
 
     def update_map(self):
         slow_type(f"""
@@ -1205,7 +1206,11 @@ class CeladonCity(MapLocation):
             self.name = "Celadon Arcade"
 
         def play_slots(self):
-            player.money -= 50
+
+            new_line()
+            slow_type("You put $25 in the machine...")
+            time.sleep(0.5)
+
             row1, row2, row3 = [], [], []
             grid = [row1, row2, row3]
 
@@ -1242,7 +1247,10 @@ class CeladonCity(MapLocation):
                 money += 50
 
             for row in grid:
-                slow_type(row, 0.1)
+                for y in range(len(row)):
+                    row[y] += "  "
+                slow_type(row, 0.5)
+
             if money > 0:
                 slow_type(f"${money} won!")
             else:
@@ -1250,11 +1258,13 @@ class CeladonCity(MapLocation):
             return money
         
         def choose(self):
-            slow_type(f"1. Play Slots ($50)\n2. Return to {player.map_location}")
+            slow_type(f"------------ You have ${player.money} ------------")
+            slow_type(f"1. Play Slots ($25)\n2. Return to {player.map_location}")
             choice = get_valid_input("Enter number: ", [1, 2])
             if choice == 1:
                 if player.money >= 50:
-                    money += self.play_slots(player.money)
+                    player.money -= 25
+                    player.money += self.play_slots()
                 else:
                     slow_type("You don't have enough money!")
                     time.sleep(1)
@@ -1294,7 +1304,7 @@ route7 = Route([Pidgey(), Pidgeotto(), Rattata(), Vulpix(), Jigglypuff(), Oddish
 
 map_object = MapLocation("Map")
 
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city]
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city]
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest)
 pewter_city.initialize(viridian_forest, route3)
@@ -1318,7 +1328,7 @@ def intro():
     time.sleep(1)
     name = input("Enter: ").strip()
     player.name = name
-    slow_type(f"Nice to meet you, {player.name}. In the world of Pokemon, we train our\nPokemon companions for battle.\nLet's get started with you choosing your Pokemon!")
+    slow_type(f"Nice to meet you, {player.name}. In the world of Pokemon,\nwe train our Pokemon companions for battle.\nLet's get started with you choosing your Pokemon!")
     time.sleep(1)
     new_line()
 
@@ -1357,17 +1367,17 @@ if __name__ == "__main__":
         get_starter()
         intro2()
         
-        #while True:
-            #if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
-           #     new_line()
-            #    slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
-            #    time.sleep(1)
-            #    player.tutorial_beat = True
-            #    break
-           # else:
-            #    player.map_location.black_out()
-           #     new_line()
-            #    slow_type("Ah, you're back. Let's try that again.")
+        while True:
+            if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
+                new_line()
+                slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
+                time.sleep(1)
+                player.tutorial_beat = True
+                break
+            else:
+                player.map_location.black_out()
+                new_line()
+                slow_type("Ah, you're back. Let's try that again.")
     try:
         player.map_location.change_location()
     except:

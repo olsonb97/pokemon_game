@@ -67,6 +67,8 @@ class Battle:
 
     def get_damage(self, attacker, move):
         damage = round(attacker.attack * move.power)
+        if move.mtype == attacker.ptype:
+            damage = damage*1.2
         return damage
     
     def take_damage(self, attacker, defender, move, damage):
@@ -172,29 +174,33 @@ class Battle:
         if move.stat == 'attack':
             if move.stat_target == 'user':
                 if attacker.attack_counter <= 2:
-                    attacker.attack += move.stat_change
+                    attacker.attack /= move.stat_change
                     attacker.attack_counter += 1
                     slow_type(f"{attacker}'s attack was raised.")
                 else:
                     slow_type(f"{attacker}'s attack won't go any higher.")
             elif move.stat_target == 'enemy':
-                if defender.attack_counter >= -2:
-                    defender.attack -= move.stat_change
+                if defender.attack_counter >= -2 and defender.attack != 1:
+                    defender.attack *= move.stat_change
                     defender.attack_counter -= 1
+                    if defender.attack <= 1:
+                        defender.attack = 1
                     slow_type(f"{defender}'s attack was lowered.")
                 else:
                     slow_type(f"{defender}'s attack won't go any lower.")
         elif move.stat == 'defense':
             if move.stat_target == 'user':
-                if attacker.defense_counter <= 2:
-                    attacker.defense -= move.stat_change
+                if attacker.defense_counter <= 2 and attacker.defense != 1:
+                    attacker.defense *= move.stat_change
                     attacker.defense_counter += 1
+                    if attacker.defense <= 1:
+                        attacker.defense = 1
                     slow_type(f"{attacker}'s defense was raised.")
                 else:
                     slow_type(f"{attacker}'s defense won't go any higher.")
             elif move.stat_target == 'enemy':
                 if defender.defense_counter >= -2:
-                    defender.defense += move.stat_change
+                    defender.defense /= move.stat_change
                     defender.defense_counter -= 1
                     slow_type(f"{defender}'s defense was lowered.")
                 else:
@@ -376,10 +382,10 @@ class Battle:
         damage = self.get_damage(attacker, move)*(attacker.level/5)
         if move.power > 0:
             self.take_damage(attacker, defender, move, damage)
-        if attacker == self.active_pokemon:
-            self.print_health(self.active_enemy_pokemon, enemy=True)
-        elif attacker == self.active_enemy_pokemon:
-            self.print_health(self.active_pokemon, user=True)
+            if attacker == self.active_pokemon:
+                self.print_health(self.active_enemy_pokemon, enemy=True)
+            elif attacker == self.active_enemy_pokemon:
+                self.print_health(self.active_pokemon, user=True)
         if move.special:
             if move.status == 'asleep':
                 self.make_asleep(defender, move)
@@ -711,6 +717,7 @@ class Player:
                     self.local_location = place
 
         except Exception as e:
+            #TESTINGTESTINGTESTING
             self.map_location = pallet_town
             self.local_location = pallet_town.pokemonlab
 
@@ -1036,6 +1043,7 @@ class MapLocation:
     def black_out(self):
         player.local_location = player.map_location.pokemon_center
         slow_type("You rushed to the nearest Pokemon Center!")
+        time.sleep(1)
         player.map_location.pokemon_center.heal()
         return True
 
@@ -1134,22 +1142,20 @@ class CeruleanCity(MapLocation):
         for route in routes:
             self.local_locations.insert(0, route)
 
-    class 
-
 class SaffronCity(MapLocation):
 
     def __init__(self):
         super().__init__("Saffron City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal, Greatball])
-        self.pokemon_gym = SaffronCity.SaffronCityGym([Psyduck(), MrMime(), Kadabra()], [31,32,33,34,35,36], [next(Kadabra.generate(38)), next(MrMime.generate(37)), next(Venomoth.generate(38)), next(Alakazam.generate(43))], "Sabrina", "Saffron City Gym", (f"Congratulations, {player.name}. You psyched me out there.\nEnjoy your journey."), "Psychic Badge")
+        self.pokemon_gym = SaffronCity.PokemonGym([Psyduck(), MrMime(), Kadabra()], [31,32,33,34,35,36], [next(Kadabra.generate(38)), next(MrMime.generate(37)), next(Venomoth.generate(38)), next(Alakazam.generate(43))], "Sabrina", "Saffron City Gym", (f"Congratulations, {player.name}. You psyched me out there.\nEnjoy your journey."), "Psychic Badge")
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
         for route in routes:
             self.local_locations.insert(0, route)
     
-    class SaffronCityGym(PokemonGym):
+    class PokemonGym(PokemonGym):
 
         def __init__(self, trainer_pokemon = [], trainer_levels = [], leader_pokemon=[], leader_name="Gym Leader", gym_name="", victory_message="", gym_badge=""):
             super().__init__(trainer_pokemon, trainer_levels, leader_pokemon, leader_name, gym_name, victory_message, gym_badge)
@@ -1181,6 +1187,80 @@ class VermillionCity(MapLocation):
         for route in routes:
             self.local_locations.insert(0, route)
 
+class CeladonCity(MapLocation):
+
+    def __init__(self):
+        super().__init__("Celadon City")
+        self.pokemon_center = PokemonCenter()
+        self.pokemart = Pokemart([Potion, FullHeal, Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball])
+        self.arcade = CeladonCity.Arcade()
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemart, self.pokemon_center, self.arcade]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+    class Arcade(Location):
+        def __init__(self):
+            self.name = "Celadon Arcade"
+
+        def play_slots(self):
+            player.money -= 50
+            row1, row2, row3 = [], [], []
+            grid = [row1, row2, row3]
+
+            for row in grid:
+                for x in range(3):
+                    row.append(random.randint(1, 3))
+
+            for row in grid:
+                for y in range(len(row)):
+                    if row[y] == 1:
+                        row[y] = "X"
+                    if row[y] == 2:
+                        row[y] = "O"
+                    if row[y] == 3:
+                        row[y] = "+"
+
+            money = 0
+
+            if row1[0] == row2[0] and row2[0] == row3[0]:
+                money += 50
+            if row1[1] == row2[1] and row2[1] == row3[1]:
+                money += 50
+            if row1[2] == row2[2] and row2[2] == row3[2]:
+                money += 50
+            if row1[0] == row1[1] and row1[1] == row1[2]:
+                money += 50
+            if row2[0] == row2[1] and row2[1] == row2[2]:
+                money += 50
+            if row3[0] == row3[1] and row3[1] == row3[2]:
+                money += 50
+            if row1[0] == row2[1] and row2[1] == row3[2]:
+                money += 50
+            if row3[0] == row2[1] and row2[1] == row1[2]:
+                money += 50
+
+            for row in grid:
+                slow_type(row, 0.1)
+            if money > 0:
+                slow_type(f"${money} won!")
+            else:
+                slow_type("No money won...")
+            return money
+        
+        def choose(self):
+            slow_type(f"1. Play Slots ($50)\n2. Return to {player.map_location}")
+            choice = get_valid_input("Enter number: ", [1, 2])
+            if choice == 1:
+                if player.money >= 50:
+                    money += self.play_slots(player.money)
+                else:
+                    slow_type("You don't have enough money!")
+                    time.sleep(1)
+            if choice == 2:
+                return True
+
 # create player
 player = Player(name="Player", money=0)
 try:
@@ -1198,6 +1278,7 @@ mount_moon = MountMoon()
 cerulean_city = CeruleanCity()
 saffron_city = SaffronCity()
 vermillion_city = VermillionCity()
+celadon_city = CeladonCity()
 
 # initializing
 trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
@@ -1208,7 +1289,8 @@ route3 = Route([Pidgey(), Spearow(), Goldeen(), Mankey(), Sandshrew(), Rattata()
 mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
 route4 = Route([Ekans(), Spearow(), Sandshrew(), Mankey(), Raticate()], [10, 11, 12, 13], mount_moon, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Route 4")
 route5 = Route([Oddish(), Pidgey(), Meowth(), Psyduck(), Ekans(), Mankey()], [10, 11, 12, 13], saffron_city, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans()], name="Route 5")
-route6 = Route([Pidgey(), Psyduck(), Mankey(), Pikachu(), Meowth(), Abra(), Pidgeotto()], [13, 14, 15, 16], saffron_city, trainer_levels=[14, 15, 16, 17], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans(), Kadabra()], name="Route 6")
+route6 = Route([Pidgey(), Psyduck(), Mankey(), Pikachu(), Meowth(), Abra(), Jigglypuff(), Pidgeotto()], [13, 14, 15, 16], saffron_city, trainer_levels=[14, 15, 16, 17], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans(), Kadabra()], name="Route 6")
+route7 = Route([Pidgey(), Pidgeotto(), Rattata(), Vulpix(), Jigglypuff(), Oddish(), Meowth(), Abra(), Mankey(), Growlithe()], [17, 18, 19, 20], saffron_city, trainer_levels=[17, 18, 19, 20, 21], trainer_pokemon=[Pidgeotto(), Jigglypuff(), Vulpix(), Meowth(), Growlithe(), Kadabra()], name="Route 7")
 
 map_object = MapLocation("Map")
 
@@ -1218,8 +1300,9 @@ viridian_city.initialize(route1, viridian_forest)
 pewter_city.initialize(viridian_forest, route3)
 mount_moon.initialize(route3, mt_moon_cave, route4)
 cerulean_city.initialize(route4, route5)
-saffron_city.initialize(route5, route6)
+saffron_city.initialize(route5, route6, route7)
 vermillion_city.initialize(route6)
+celadon_city.initialize(route7)
 
 # intialize player location
 player.initialize()
@@ -1253,7 +1336,7 @@ def get_starter():
         oak_pokemon = next(Squirtle.generate(5))
     elif starter_choice == 3:
         starter = Squirtle(5, name=starter_nickname, moves=[water_gun, tackle, tail_whip], player_owned=True)
-        oak_pokemon = next(Charmander.generate(5, ))
+        oak_pokemon = next(Charmander.generate(5))
     player.pokemon.append(starter)
     check_pokedex(next(starter.__class__.generate(5)), player)
     starters.pop(starter_choice-1)
@@ -1274,17 +1357,17 @@ if __name__ == "__main__":
         get_starter()
         intro2()
         
-        while True:
-            if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
-                new_line()
-                slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
-                time.sleep(1)
-                player.tutorial_beat = True
-                break
-            else:
-                player.map_location.black_out()
-                new_line()
-                slow_type("Ah, you're back. Let's try that again.")
+        #while True:
+            #if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
+           #     new_line()
+            #    slow_type("You're ready to set out.\nCatch Pokemon and train them.\nDefeat the Gym Leader in\nPewter City to win!")
+            #    time.sleep(1)
+            #    player.tutorial_beat = True
+            #    break
+           # else:
+            #    player.map_location.black_out()
+           #     new_line()
+            #    slow_type("Ah, you're back. Let's try that again.")
     try:
         player.map_location.change_location()
     except:

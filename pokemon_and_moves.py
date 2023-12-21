@@ -56,8 +56,8 @@ water_gun = Move("Water Gun", 'water', 5.5, 90)
 vine_whip = Move("Vine Whip", 'grass', 5.5, 90)
 thunder_shock = Move("Thunder Shock", 'electric', 5, 100)
 
-tackle = Move("Tackle", 'normal', 4.5, 100)
-astonish = Move("Astonish", 'ghost', 4.5, 100)
+tackle = Move("Tackle", 'normal', 5, 100)
+astonish = Move("Astonish", 'ghost', 5, 100)
 poison_sting = Move("Poison Sting", 'poison', 3, 100, special=True, status='poisoned')
 yawn = Move("Yawn", 'normal', 0, 50, special=True, status='asleep')
 confuse_ray = Move("Confuse Ray", 'ghost', 0, 100, special=True, status='confused')
@@ -65,6 +65,7 @@ supersonic = Move("Supersonic", 'normal', 0, 55, special=True, status='confused'
 thunder_wave = Move("Thunder Wave", 'electric', 0, 90, special=True, status='paralyzed')
 electro_ball = Move("Electro Ball", 'electric', 6, 100)
 swift = Move("Swift", 'normal', 6.5, 100)
+howl = Move("Howl", 'normal', 0, 100, stat='attack', stat_change=0.9, stat_target='user')
 thunderbolt = Move("Thunderbolt", 'electric', 9, 100)
 sludge_bomb = Move("Sludge Bomb", 'poison', 9, 100)
 thunder = Move("Thunder", 'electric', 11, 70)
@@ -74,12 +75,13 @@ earth_power = Move("Earth Power", 'ground', 8.5, 100)
 wing_attack = Move("Wing Attack", 'flying', 7, 90)
 drill_peck = Move("Drill Peck", 'flying', 8, 100)
 peck = Move("Peck", 'flying', 5, 100)
+hyper_voice = Move("Hyper Voice", 'normal', 9, 100)
 horn_attack = Move("Horn Attack", 'normal', 7, 100)
 waterfall = Move("Waterfall", 'water', 8, 100)
 megahorn = Move("Megahorn", 'bug', 11, 85)
 scratch = Move("Scratch", 'normal', 5.5, 95)
 spark = Move("Spark", 'normal', 6, 100)
-mud_slap = Move("Mud Slap", 'ground', 4, 100)
+mud_slap = Move("Mud Slap", 'ground', 4.5, 100)
 bulldoze = Move("Bulldoze", 'ground', 6.5, 85)
 rock_blast = Move("Rock Blast", 'rock', 6.5, 90)
 rock_slide = Move("Rock Slide", 'rock', 7, 90)
@@ -96,27 +98,27 @@ rock_throw = Move("Rock Throw", 'rock', 6, 85)
 stone_edge = Move("Stone Edge", 'rock', 100, 80)
 low_kick = Move("Low Kick", 'fighting', 5.5, 90)
 aqua_tail = Move("Aqua Tail", 'water', 7, 90)
-flame_wheel = Move("Flame Wheel", 'fire', 7, 90)
+flame_wheel = Move("Flame Wheel", 'fire', 6, 90)
 razor_leaf = Move("Razor Leaf", 'grass', 7, 95)
 earthquake = Move("Earthquake", 'ground', 9, 90)
 seismic_toss = Move("Seismic Toss", 'fighting', 6.5, 100)
 bug_buzz = Move("Bug Buzz", 'bug', 8, 90)
 cross_chop = Move("Cross Chop", 'fighting', 9.5, 80)
 close_combat = Move("Close Combat", 'fighting', 11, 80)
-swagger = Move("Swagger", 'normal', 0, 85, stat='attack', stat_change=0.2, stat_target='user')
+swagger = Move("Swagger", 'normal', 0, 85, stat='attack', stat_change=0.9, stat_target='user')
 aerial_ace = Move("Aerial Ace", 'flying', 8, 90)
 absorb = Move("Absorb", 'grass', 3.5, 100)
-rock_polish = Move("Rock Polish", 'rock', 0, 100, stat='attack', stat_change=0.15, stat_target='user')
+rock_polish = Move("Rock Polish", 'rock', 0, 100, stat='attack', stat_change=0.9, stat_target='user')
 discharge = Move("Discharge", 'electric', 8, 100)
 poison_fang = Move("Poison Fang", 'poison', 5.5, 100)
-swords_dance = Move("Swords Dance", 'normal', 0, 100, stat='attack', stat_change=0.25, stat_target='user')
-defense_curl = Move("Defense Curl", 'normal', 0, 100, stat='defense', stat_change=0.15, stat_target='user')
-screech = Move("Screech", 'normal', 0, 85, stat='defense', stat_change=0.2, stat_target='enemy')
-leer = Move("Leer", 'normal', 0, 100, stat='defense', stat_change=0.15, stat_target='enemy')
-charge = Move("Charge", 'electric', 0, 100, stat='attack', stat_change=0.15, stat_target='user')
-tail_whip = Move("Tail Whip", 'normal', 0, 100, stat='defense', stat_change=0.15, stat_target='enemy')
-growth = Move("Growth", 'normal', 0, 100, stat='attack', stat_change=0.15, stat_target='user')
-growl = Move("Growl", 'normal', 0, 100, stat='attack', stat_change=0.15, stat_target='enemy')
+swords_dance = Move("Swords Dance", 'normal', 0, 100, stat='attack', stat_change=0.85, stat_target='user')
+defense_curl = Move("Defense Curl", 'normal', 0, 100, stat='defense', stat_change=0.9, stat_target='user')
+screech = Move("Screech", 'normal', 0, 85, stat='defense', stat_change=0.85, stat_target='enemy')
+leer = Move("Leer", 'normal', 0, 100, stat='defense', stat_change=0.9, stat_target='enemy')
+charge = Move("Charge", 'electric', 0, 100, stat='attack', stat_change=0.9, stat_target='user')
+tail_whip = Move("Tail Whip", 'normal', 0, 100, stat='defense', stat_change=0.9, stat_target='enemy')
+growth = Move("Growth", 'normal', 0, 100, stat='attack', stat_change=0.9, stat_target='user')
+growl = Move("Growl", 'normal', 0, 100, stat='attack', stat_change=0.9, stat_target='enemy')
 fire_fang = Move("Fire Fang", 'fire', 8, 95)
 zap_cannon = Move("Zap Cannon", 'electric', 11, 50)
 slash = Move("Slash", 'normal', 7, 100)
@@ -124,22 +126,25 @@ flamethrower = Move("Flamethrower", 'fire', 9, 100)
 stun_spore = Move("Stun Spore", 'grass', 0, 75, special=True, status='paralyzed')
 flare_blitz = Move("Flare Blitz", 'fire', 11, 60)
 nuzzle = Move("Nuzzle", 'electric', 4, 100)
+slap = Move("Slap", 'normal', 4.5, 100)
 poison_powder = Move("Poison Powder", 'poison', 0, 75, special=True, status='poisoned')
 sleep_powder = Move("Sleep Powder", 'grass', 0, 75, special=True, status='asleep')
 seed_bomb = Move("Seed Bomb", 'grass', 8, 100)
 power_whip = Move("Power Whip", 'grass', 11, 60)
+sing = Move("Sing", 'normal', 0, 55, special=True, status='asleep')
 rapid_spin = Move("Rapid Spin", 'normal', 7, 100)
 water_pulse = Move("Water Pulse", 'water', 7, 100)
-shell_smash = Move("Shell Smash", 'normal', 0, 100, stat='defense', stat_change=0.2, stat_target='enemy')
-iron_defense = Move("Iron Defense", 'normal', 0, 100, stat='defense', stat_change=0.2, stat_target='user')
+shell_smash = Move("Shell Smash", 'normal', 0, 100, stat='defense', stat_change=0.85, stat_target='enemy')
+iron_defense = Move("Iron Defense", 'normal', 0, 100, stat='defense', stat_change=0.85, stat_target='user')
 hydro_pump = Move("Hydro Pump", 'water', 11, 60)
 psyshock = Move("Psyshock", 'psychic', 8, 100)
 psybeam = Move("Psybeam", 'psychic', 8, 100)
 headbutt = Move("Headbutt", 'normal', 7, 100)
 psycho_cut = Move("Psycho Cut", 'psychic', 7.5, 100)
+covet = Move("Covet", 'normal', 6, 100)
 power_gem = Move("Power Gem", 'rock', 8, 100)
 zen_headbutt = Move("Zen Headbutt", 'psychic', 8, 90)
-harden = Move("Harden", 'normal', 0, 100, stat='defense', stat_change = 0.15, stat_target='user')
+harden = Move("Harden", 'normal', 0, 100, stat='defense', stat_change = 0.9, stat_target='user')
 venoshock = Move("Venoshock", 'poison', 7, 100)
 poison_jab = Move("Poison Jab", 'poison', 8, 100)
 
@@ -414,7 +419,7 @@ class Venusaur(Pokemon):
     learnable_moves = Bulbasaur.learnable_moves
 
     def __init__(self, level=12, name='', moves=None, player_owned=False):
-        super().__init__('Venusaur', 44, 'grass', 1.11, 1.06, level, moves, name, player_owned)
+        super().__init__('Venusaur', 44, 'grass', 1.11, 1.07, level, moves, name, player_owned)
     
 class Squirtle(Pokemon):
 
@@ -473,7 +478,7 @@ class Starmie(Pokemon):
     learnable_moves = Staryu.learnable_moves
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Starmie', 41, 'water', 1.12, 1.07, level, moves, name, player_owned)
+        super().__init__('Starmie', 41, 'water', 1.08, 1.11, level, moves, name, player_owned)
         
 class Goldeen(Pokemon):
 
@@ -540,7 +545,16 @@ class Vulpix(Pokemon):
     learnable_moves = {1: [ember, tail_whip], 10: [flame_wheel], 20: [confuse_ray], 32: [flamethrower], 45: [flare_blitz]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Vulpix', 38, 'fire', 1.09, 1.09, level, moves, name, player_owned)
+        super().__init__('Vulpix', 38, 'fire', 1.095, 1.095, level, moves, name, player_owned)
+        self.evolve_level1 = 32
+        self.evolve_pokemon1 = Ninetales()
+
+class Ninetales(Pokemon):
+
+    learnable_moves = Vulpix.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Ninetales', 42, 'fire', 1.11, 1.09, level, moves, name, player_owned)
 
 class Pidgey(Pokemon):
 
@@ -891,3 +905,33 @@ class Electrode(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Electrode', 40, 'electric', 1.11, 1.109, level, moves, name, player_owned)
+
+class Growlithe(Pokemon):
+
+    learnable_moves = {1: [ember, leer], 4: [howl], 12: [flame_wheel], 24: [fire_fang], 32: [headbutt], 40: [flamethrower], 52: [flare_blitz]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Growlithe', 39, 'fire', 1.105, 1.11, level, moves, name, player_owned)
+        self.evolved_pokemon1 = Arcanine()
+        self.evovled_level1 = 32
+
+class Arcanine(Pokemon):
+
+    learnable_moves = Growlithe.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Arcanine', 43, 'fire', 1.11, 1.105, level, moves, name, player_owned)
+
+class Jigglypuff(Pokemon):
+
+    learnable_moves = {1: [sing, slap, defense_curl], 8: [covet], 18: [swift], 24: [headbutt], 38: [hyper_voice]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Jigglypuff', 38, 'normal', 1, 1.105, level, moves, name, player_owned)
+
+class Wigglytuff(Pokemon):
+
+    learnable_moves = Jigglypuff.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Wigglytuff', 44, 'normal', 1, 1, level, moves, name, player_owned)

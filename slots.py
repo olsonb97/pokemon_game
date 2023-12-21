@@ -11,7 +11,14 @@ def slots():
         for x in range(3):
             row.append(random.randint(1, 3))
 
-        
+    for row in grid:
+        for y in range(len(row)):
+            if row[y] == 1:
+                row[y] = "X"
+            if row[y] == 2:
+                row[y] = "O"
+            if row[y] == 3:
+                row[y] = "+"
 
     money = 0
 
@@ -38,5 +45,3 @@ def slots():
         print(row)
 
     print(f"{money} won!")
-
-slots()

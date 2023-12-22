@@ -75,7 +75,7 @@ thunder = Move("Thunder", 'electric', 11, 70)
 gunk_shot = Move("Gunk Shot", 'poison', 11, 80)
 splash = Move("Spash", 'normal', 0, 50)
 earth_power = Move("Earth Power", 'ground', 8, 100)
-wing_attack = Move("Wing Attack", 'flying', 6.5, 90)
+wing_attack = Move("Wing Attack", 'flying', 5.5, 90)
 drill_peck = Move("Drill Peck", 'flying', 8, 100)
 peck = Move("Peck", 'flying', 3.5, 100)
 hyper_voice = Move("Hyper Voice", 'normal', 9, 100)
@@ -85,6 +85,7 @@ megahorn = Move("Megahorn", 'bug', 11, 85)
 scratch = Move("Scratch", 'normal', 5, 95)
 spark = Move("Spark", 'normal', 5, 100)
 mud_slap = Move("Mud Slap", 'ground', 4, 100)
+mega_drain = Move("Mega Drain", 'grass', 5, 100)
 bulldoze = Move("Bulldoze", 'ground', 6, 85)
 rock_blast = Move("Rock Blast", 'rock', 6.5, 90)
 rock_slide = Move("Rock Slide", 'rock', 7, 90)
@@ -138,6 +139,10 @@ seed_bomb = Move("Seed Bomb", 'grass', 8, 100)
 power_whip = Move("Power Whip", 'grass', 11, 60)
 sing = Move("Sing", 'normal', 0, 55, special=True, status='asleep')
 rapid_spin = Move("Rapid Spin", 'normal', 7, 100)
+crab_hammer = Move("Crab Hammer", 'water', 10, 90)
+bubble_beam = Move("Bubblebeam", 'water', 5.5, 100)
+mud_shot = Move("Mud Shot", 'ground', 5.5, 100)
+giga_drain = Move("Giga Drain", 'grass', 8, 100)
 water_pulse = Move("Water Pulse", 'water', 7.5, 100)
 shell_smash = Move("Shell Smash", 'normal', 0, 100, stat='defense', stat_change=0.85, stat_target='enemy')
 iron_defense = Move("Iron Defense", 'normal', 0, 100, stat='defense', stat_change=0.85, stat_target='user')
@@ -169,7 +174,7 @@ class Pokemon:
         self.base_defense = defense
         self.species = species
         self.ptype = ptype        
-        self.maxhp = round(self.base_hp*(level/5))
+        self.maxhp = round(self.base_hp*(level/5)*.7)
         self.hp = self.maxhp
         self.attack = round(self.base_attack*(level/5), 2)
         self.defense = round(self.base_defense*(level/5), 2)
@@ -254,9 +259,9 @@ class Pokemon:
             self.resistance = ['ice']
 
     def update_stats(self, level):
-        self.maxhp = round(self.base_hp*(level/5))
+        self.maxhp = round(self.base_hp*(level/5)*.7)
         self.attack = round(self.base_attack*(level/5), 2)
-        self.defense = round(self.base_defense/(level/5), 2)
+        self.defense = round(self.base_defense*(level/5), 2)
     
     def __repr__(self):
         return self.name
@@ -274,13 +279,21 @@ class Pokemon:
             while self.xp >= 100:
                 self.level_up()
                 for key, val in self.__class__.learnable_moves.items():
-                    self.learn_move(key, val)
+                    if key == self.level:
+                        self.learn_move(key, val)
                 self.xp -= 100
             time.sleep(0.5)
 
 
     def learn_move(self, level=0, moves=[], tm=None):
-        if self.level == level or (tm.itype == 'tmhm' and tm.move.mtype == self.ptype):
+        approved=False
+        if tm is None:
+            if self.level == level:
+                approved = True
+        else:
+            if (tm.itype == 'tmhm' and not tm.move == fly) or (self.ptype == 'flying' and tm.move == fly):
+                approved = True
+        if approved:
             time.sleep(0.5)
             new_line()
             for move in moves:
@@ -290,7 +303,9 @@ class Pokemon:
                         self.move_set.append(move)
                         time.sleep(1)
                     else:
-                        slow_type(f"{self.name} is trying to learn {move}.\nDelete a move to make room?\n1. Yes\n2. No")
+                        slow_type(f"{self.name} is trying to learn {move}.")
+                        time.sleep(0.5)
+                        slow_type("Delete a move to make room?\n1. Yes\n2. No")
                         choice = get_valid_input("Enter number: ", [1, 2])
                         if choice == 1:
                             new_line()
@@ -301,6 +316,7 @@ class Pokemon:
                             slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
                             time.sleep(1)
                             slow_type(f"...and learned {move}!")
+                            time.sleep(0.5)
                             self.move_set[move_index] = move
                         elif choice == 2:
                             continue
@@ -315,7 +331,7 @@ class Pokemon:
         possible_moves = []
         while len(possible_moves) < 2:
             for key, val in cls.learnable_moves.items():
-                if key <= level:
+                if level >= key:
                     for move in val:
                         if move not in possible_moves and random.randint(1,101) < 70:
                             possible_moves.append(move)
@@ -569,7 +585,7 @@ class Ninetales(Pokemon):
 
 class Pidgey(Pokemon):
 
-    learnable_moves = {1: [growl, tackle], 7: [peck], 20: [wing_attack], 30: [aerial_ace]}
+    learnable_moves = {1: [growl, tackle], 7: [peck], 20: [wing_attack], 30: [aerial_ace, tackle, growl, headbutt]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Pidgey', 37, 'flying', 2, 1.9, level, moves, name, player_owned)
@@ -714,6 +730,8 @@ class Bellsprout(Pokemon):
         super().__init__('Bellsprout', 35, 'grass', 1.8, 1.8, level, moves, name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Weepinbell()
+        self.evolve_level2 = 29
+        self.evolve_pokemon2 = Victreebel()
         
 class Weepinbell(Pokemon):
 
@@ -721,6 +739,22 @@ class Weepinbell(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Weepinbell', 39, 'grass', 1.9, 1.9, level, moves, name, player_owned)
+        self.evolve_level1 = 29
+        self.evolve_pokemon1 = Victreebel()
+
+class Victreebel(Pokemon):
+
+    learnable_moves = Bellsprout.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Victreebel', 41, 'grass', 2.1, 2, level, moves, name, player_owned)
+
+class Tangela(Pokemon):
+    
+    learnable_moves = {1: [sleep_powder, tackle], 7: [vine_whip], 10: [absorb], 20: [growth], 23: [mega_drain], 29: [stun_spore], 38: [ancient_power], 50: [power_whip]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Tangela', 40, 'grass', 2, 2.2, level, moves, name, player_owned)
         
 class Oddish(Pokemon):
 
@@ -730,6 +764,8 @@ class Oddish(Pokemon):
         super().__init__('Oddish', 37, 'grass', 1.85, 1.85, level, moves, name, player_owned)
         self.evolve_level1 = 21
         self.evolve_pokemon1 = Gloom()
+        self.evolve_level2 = 30
+        self.evolve_pokemon2 = Vileplume()
         
 class Gloom(Pokemon):
 
@@ -737,6 +773,13 @@ class Gloom(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Gloom', 39, 'grass', 2.05, 2, level, moves, name, player_owned)
+
+class Vileplume(Pokemon):
+
+    learnable_moves = Oddish.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Gloom', 42, 'grass', 2.15, 2.1, level, moves, name, player_owned)
 
 class Spearow(Pokemon):
 
@@ -939,6 +982,8 @@ class Jigglypuff(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Jigglypuff', 38, 'normal', 1.8, 2, level, moves, name, player_owned)
+        self.evolve_level1 = 25
+        self.evolve_pokemon1 = Wigglytuff()
 
 class Wigglytuff(Pokemon):
 
@@ -953,3 +998,47 @@ class Aerodactyl(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Aerodactyl', 44, 'normal', 2.2, 1.9, level, moves, name, player_owned)
+
+class Poliwag(Pokemon):
+
+    learnable_moves = {1: [water_gun, defense_curl], 6: [tackle], 12: [mud_shot], 18: [bubble_beam], 24: [water_pulse], 30: [headbutt], 36: [earth_power], 42: [hydro_pump]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Poliwag', 38, 'water', 2, 1.9, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Poliwhirl()
+        self.evolve_level1 = 25
+        self.evolve_pokemon2 = Poliwrath()
+        self.evolve_level2 = 35
+
+class Poliwhirl(Pokemon):
+
+    learnable_moves = Poliwag.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Poliwhirl', 41, 'water', 2.15, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Poliwrath()
+        self.evolve_level1 = 35
+
+class Poliwrath(Pokemon):
+
+    learnable_moves = Poliwag.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Poliwrath', 43, 'water', 2.25, 2.15, level, moves, name, player_owned)
+
+class Krabby(Pokemon):
+
+    learnable_moves = {1: [water_gun, leer], 4: [harden], 12: [mud_shot], 20: [bubble_beam], 25: [headbutt], 32: [water_pulse], 40: [swords_dance], 45: [crab_hammer]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Krabby', 39, 'water', 2.05, 1.95, level, moves, name, player_owned)
+        self.evolve_level1 = 28
+        self.evolve_pokemon1 = Kingler()
+
+class Kingler(Pokemon):
+
+    learnable_moves = Krabby.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Kingler', 42, 'water', 2.2, 1.95, level, moves, name, player_owned)
+

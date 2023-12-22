@@ -76,7 +76,7 @@ class Battle:
         if accuracy_roll <= move.accuracy:
             damage = round(damage / defender.defense)
             if move.mtype in defender.weakness:
-                damage = round(damage * 2)
+                damage = round(damage * 1.5)
                 slow_type("It was super effective!")
             if move.mtype in defender.resistance:
                 damage = round(damage * 0.5)
@@ -116,11 +116,11 @@ class Battle:
     def print_moves(self):
         for i in self.active_pokemon.move_set:
             if not i.special and i.stat is None:
-                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Power: {i.power} | Type: {i.mtype.capitalize()} | Accuracy: {i.accuracy}")
+                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Power: {i.power} | Type: {i.mtype.capitalize()} | Accuracy: {i.accuracy}", 0.001)
             elif i.special:
-                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Status: {i.status.capitalize()} | Accuracy: {i.accuracy}")
+                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Status: {i.status.capitalize()} | Accuracy: {i.accuracy}", 0.001)
             elif i.stat is not None:
-                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Stat Change: {i.stat_target.capitalize()}'s {i.stat.capitalize()} | Accuracy: {i.accuracy}")
+                slow_type(f"{self.active_pokemon.move_set.index(i)+1}. {i.name} | Stat Change: {i.stat_target.capitalize()}'s {i.stat.capitalize()} | Accuracy: {i.accuracy}", 0.001)
 
     def make_asleep(self, sleepee, move):
         random_num = random.randint(1, 100)
@@ -320,7 +320,7 @@ class Battle:
         if not self.alive_check(self.active_enemy_pokemon):
 
             # calculate xp
-            Pokemon.xp_boost(self.active_pokemon, self.calculate_xp())
+            self.active_pokemon.xp_boost(self.calculate_xp())
 
             healthy_enemy_pokemon = len(self.trainer_pokemon)
             for index, pokemon in enumerate(self.trainer_pokemon):
@@ -466,7 +466,7 @@ class Battle:
             if choice == 1:
                 new_line()
                 self.print_moves()
-                move_choice = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
+                move_choice = get_valid_input("Enter number: ", list(range(1, len(self.active_pokemon.move_set)+1)))-1
                 move = self.active_pokemon.move_set[move_choice]
                 new_line()
                 if self.healthy_checker(self.active_pokemon, attack_turn=True):
@@ -671,6 +671,24 @@ class Greatball(Item):
         self.cost = 100
         self.id = Pokeball.id
         Greatball.id += 1
+    
+    def use(self, pokemon, item_list):
+        counter = 0
+        while counter < 5:
+            slow_type("...")
+            time.sleep(0.5)
+            if random.randint(1, 100) in range(1, self.power*round(pokemon.maxhp/pokemon.hp)):
+                counter += 1
+                if counter >= 5:
+                    slow_type(f"{pokemon} was caught!")
+                    time.sleep(0.5)
+                    item_list.remove(self)
+                    return True
+            else:
+                slow_type(f"{pokemon} escaped the {self}...")
+                time.sleep(0.5)
+                item_list.remove(self)
+                return False
 
 class Ultraball(Item):
 
@@ -680,6 +698,24 @@ class Ultraball(Item):
         self.cost = 150
         self.id = Pokeball.id
         Ultraball.id += 1
+
+    def use(self, pokemon, item_list):
+        counter = 0
+        while counter < 5:
+            slow_type("...")
+            time.sleep(0.5)
+            if random.randint(1, 100) in range(1, self.power*round(pokemon.maxhp/pokemon.hp)):
+                counter += 1
+                if counter >= 5:
+                    slow_type(f"{pokemon} was caught!")
+                    time.sleep(0.5)
+                    item_list.remove(self)
+                    return True
+            else:
+                slow_type(f"{pokemon} escaped the {self}...")
+                time.sleep(0.5)
+                item_list.remove(self)
+                return False
 
 class TM(Item):
 
@@ -697,7 +733,7 @@ class TM(Item):
         slow_type(f"{counter}. Back")
         pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(party)+2)))-1
         if pokemon_choice in range(0, len(party)):
-            party[pokemon_choice].learn_move(party[pokemon_choice], moves=[self.power], tm=self)
+            party[pokemon_choice].learn_move(party[pokemon_choice].level, moves=[self.power], tm=self)
             item_list.remove(self)
             return True
         return True
@@ -772,10 +808,12 @@ class Player:
 
         except Exception as e:
             #TESTINGTESTINGTESTING
-            self.map_location = pewter_city
-            self.local_location = pewter_city.pokemon_center
+            self.map_location = celadon_city
+            self.local_location = celadon_city.pokemon_center
             self.tms_hms.append(hm_fly)
             self.tms_hms.append(next(TM.generate(flamethrower)))
+            self.tms_hms.append(hm_cut)
+            self.pokemon.append(Pidgeot(29, moves=Pidgeot.generate_moves(29), player_owned=True))
             self.money = 500
 
     def update_map(self):
@@ -1054,22 +1092,26 @@ class MapLocation:
     def inventory_display(self):
         while True:
             slow_type("------------ Inventory ------------")
+            fly_found = False
             for pokemon in player.pokemon:
                 if fly in pokemon.move_set:
                     slow_type(f"You have ${player.money}.\n1. Check Pokemon\n2. Check Bag\n3. Check Map\n4. Check Pokedex\n5. Save Data\n6. Back\n7. Fly")
                     choice = get_valid_input("Enter number: ", [1, 2, 3, 4, 5, 6, 7])
-                else:
-                    slow_type(f"You have ${player.money}.\n1. Check Pokemon\n2. Check Bag\n3. Check Map\n4. Check Pokedex\n5. Save Data\n6. Back")
-                    choice = get_valid_input("Enter number: ", [1, 2, 3, 4, 5, 6])
+                    fly_found = True
+                    break
+            if not fly_found:
+                slow_type(f"You have ${player.money}.\n1. Check Pokemon\n2. Check Bag\n3. Check Map\n4. Check Pokedex\n5. Save Data\n6. Back")
+                choice = get_valid_input("Enter number: ", [1, 2, 3, 4, 5, 6])
             if choice == 1:
                 self.display_party()
+                return True
             elif choice == 2:
                 slow_type("------------ Bag ------------")
                 slow_type(f"Badges: {'None' if len(player.gym_badges) == 0 else ', '.join(player.gym_badges)}")
                 slow_type("1. Items\n2. TM's & HM's\n3. Key Items\n4. Back")
-                bag_choice = get_valid_input("Enter number: ", [1, 2, 3])
-                new_line()
+                bag_choice = get_valid_input("Enter number: ", [1, 2, 3, 4])
                 if bag_choice == 1:
+                    new_line()
                     if player.items == []:
                         slow_type("No items left.")
                     else:
@@ -1085,6 +1127,7 @@ class MapLocation:
                         else:
                             return True
                 elif bag_choice == 2:
+                    new_line()
                     if player.tms_hms == []:
                         slow_type("No TM's or HM's.")
                     else:
@@ -1100,8 +1143,12 @@ class MapLocation:
                         else:
                             return True
                 elif bag_choice == 3:
-                    slow_type("not ready yet")
-                    return
+                    new_line()
+                    for index, item in enumerate(player.key_items):
+                        slow_type(f"{index+1}. {item}")
+                    return True
+                elif bag_choice == 4:
+                    return True
                         
             elif choice == 3:
                 player.update_map()
@@ -1213,7 +1260,7 @@ class PewterCity(MapLocation):
         super().__init__("Pewter City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball])
-        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [next(Geodude.generate(8)), next(Onix.generate(12))], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge", hm_cut)
+        self.pokemon_gym = PokemonGym([Geodude(), Mankey(), Sandshrew()], [8, 9, 10], [next(Geodude.generate(8)), next(Onix.generate(12))], "Brock", "Pewter City Gym", (f"Congratulations, {player.name}. You hit like a rock!\nBest of luck on your journey."), "Rock Badge", next(TM.generate(rock_blast)))
         self.museum = PewterCity.Museum()
 
     def initialize(self, *routes):
@@ -1257,6 +1304,7 @@ class PewterCity(MapLocation):
                                 slow_type("You found an Amber!\nAmber added to Key Items")
                                 player.key_items.append(amber)
                                 player.museum_tree_cut = True
+                                return True
                             elif cut_choice == 2:
                                 return True
                 else:
@@ -1277,7 +1325,7 @@ class PewterCity(MapLocation):
                     slow_type("Aerodactyl was added to your party!")
                     time.sleep(1)
                 else:
-                    slow_type("I think we can do something with this, but your party is full!")
+                    slow_type("We can defintely restore this, but your party is full!")
             return True
 
 # mount moon
@@ -1360,9 +1408,10 @@ class CeladonCity(MapLocation):
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, FullHeal, Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball])
         self.arcade = CeladonCity.Arcade()
+        self.pokemon_gym = PokemonGym([Bellsprout(), Weepinbell(), Ivysaur(), Gloom()], [21, 22, 23, 24, 25, 26], [next(Tangela.generate(24)), next(Victreebel.generate(29)), next(Vileplume.generate(29))], "Erika", "Celadon City Gym", "You really had me in a bind\nTake care now.", "Grass Badge", next(TM.generate(giga_drain)))
 
     def initialize(self, *routes):
-        self.local_locations = [self.pokemart, self.pokemon_center, self.arcade]
+        self.local_locations = [self.pokemart, self.pokemon_center, self.arcade, self.pokemon_gym]
         for route in routes:
             self.local_locations.insert(0, route)
 
@@ -1468,11 +1517,14 @@ trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "
 
 route1 = Route([Rattata(), Pidgey(), Oddish(), Bellsprout()], [3, 4, 5], viridian_city, pallet_town, trainer_levels=[4, 5, 6], trainer_pokemon=[Rattata(), Pidgey(), Oddish(), Bellsprout()], name="Route 1")
 viridian_forest = Route([Weedle(), Caterpie(), Bellsprout(), Rattata(), Pikachu()], [4, 5, 6], viridian_city, pewter_city, trainer_levels=[4, 5, 6], trainer_pokemon=[Bellsprout(), Rattata(), Pikachu(), Weedle(), Caterpie()], name="Route 2: Viridian Forest")
-route3 = Route([Pidgey(), Spearow(), Goldeen(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
-mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
+viridian_pond = Route([Magikarp(), Goldeen()], [4, 5, 6], viridian_city, trainer_levels=[4, 5, 6], trainer_pokemon=[Magikarp(), Goldeen(), Poliwag()], name="Viridian Pond")
+route3 = Route([Pidgey(), Spearow(), Mankey(), Sandshrew(), Rattata()], [6, 7, 8], mount_moon, pewter_city, trainer_levels= [6, 7, 8], trainer_pokemon=[Pikachu(), Sandshrew(), Vulpix(), Spearow(), Mankey()], name="Route 3")
 route4 = Route([Ekans(), Spearow(), Sandshrew(), Mankey(), Raticate()], [10, 11, 12, 13], mount_moon, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Route 4")
-route5 = Route([Oddish(), Pidgey(), Meowth(), Psyduck(), Ekans(), Mankey()], [10, 11, 12, 13], saffron_city, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans()], name="Route 5")
+mt_moon_cave = Route([Magnemite(), Cubone(), Diglett(), Rattata(), Geodude(), Zubat()], [8, 9, 10, 11], mount_moon, None, trainer_levels=[9, 10, 11, 12], trainer_pokemon=[Magnemite(), Cubone(), Diglett(), Geodude()], name="Mount Moon Cave")
+cerulean_river = Route([Magikarp(), Goldeen(), Poliwag()], [9, 10, 11], cerulean_city, trainer_levels=[9, 10, 11], trainer_pokemon=[Magikarp(), Goldeen(), Poliwag()], name="Cerulean River")
+route5 = Route([Oddish(), Pidgey(), Abra(), Jigglypuff(), Meowth(), Psyduck(), Ekans(), Mankey()], [10, 11, 12, 13], saffron_city, cerulean_city, trainer_levels=[11, 12, 13, 14], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans()], name="Route 5")
 route6 = Route([Pidgey(), Psyduck(), Mankey(), Pikachu(), Meowth(), Abra(), Jigglypuff(), Pidgeotto()], [13, 14, 15, 16], saffron_city, vermillion_city, trainer_levels=[14, 15, 16, 17], trainer_pokemon=[Pidgeotto(), Meowth(), Pidgey(), Ekans(), Kadabra()], name="Route 6")
+vermillion_sea = Route([Magikarp(), Goldeen(), Poliwag(), Krabby()], [14, 15, 16, 17], vermillion_city, trainer_levels=[14, 15, 16, 17], trainer_pokemon=[Magikarp(), Poliwhirl(), Krabby(), Seaking() ], name="Vermillion Sea")
 route7 = Route([Pidgey(), Pidgeotto(), Rattata(), Vulpix(), Jigglypuff(), Oddish(), Meowth(), Abra(), Mankey(), Growlithe()], [17, 18, 19, 20], saffron_city, trainer_levels=[17, 18, 19, 20, 21], trainer_pokemon=[Pidgeotto(), Jigglypuff(), Vulpix(), Meowth(), Growlithe(), Kadabra()], name="Route 7")
 route8 = Route([Pidgey(), Pidgeotto(), Rattata(), Vulpix(), Jigglypuff(), Oddish(), Meowth(), Abra(), Mankey(), Growlithe()], [17, 18, 19, 20], saffron_city, celadon_city, trainer_levels=[17, 18, 19, 20, 21], trainer_pokemon=[Pidgeotto(), Jigglypuff(), Vulpix(), Meowth(), Growlithe(), Kadabra()], name="Route 8")
 
@@ -1480,12 +1532,12 @@ map_object = MapLocation("Map")
 
 map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city]
 pallet_town.initialize(route1)
-viridian_city.initialize(route1, viridian_forest)
+viridian_city.initialize(route1, viridian_forest, viridian_pond)
 pewter_city.initialize(viridian_forest, route3)
 mount_moon.initialize(route3, mt_moon_cave, route4)
-cerulean_city.initialize(route4, route5)
+cerulean_city.initialize(route4, route5, cerulean_river)
 saffron_city.initialize(route5, route6, route7, route8)
-vermillion_city.initialize(route6)
+vermillion_city.initialize(route6, vermillion_sea)
 celadon_city.initialize(route8)
 
 # intialize player location
@@ -1504,7 +1556,7 @@ def intro():
     new_line()
     player.name = name
     slow_type(f"Nice to meet you, {player.name}. In the world of Pokemon,\nwe train our Pokemon companions for battle.\nLet's get started with you choosing your Pokemon!")
-    time.sleep(1)
+    time.sleep(0.5)
     new_line()
 
 def get_starter():
@@ -1536,11 +1588,11 @@ def intro2():
 # game
 if __name__ == "__main__":
 
-    if not player.tutorial_beat:
+    #if not player.tutorial_beat:
 
-        intro()
-        get_starter()
-        intro2()
+        #intro()
+        #get_starter()
+        #intro2()
         
         #while True:
        #     if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():

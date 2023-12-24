@@ -741,7 +741,7 @@ class TM(Item):
         slow_type(f"{counter}. Back")
         pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(party)+2)))-1
         if pokemon_choice in range(0, len(party)):
-            party[pokemon_choice].learn_move(party[pokemon_choice].level, moves=[self.power], tm=self)
+            party[pokemon_choice].learn_move(party[pokemon_choice].level, moves=[self.move], tm=self)
             item_list.remove(self)
             return True
         return True
@@ -766,7 +766,7 @@ class HM(Item):
         slow_type(f"{counter}. Back")
         pokemon_choice = get_valid_input("Enter number: ", list(range(1, len(party)+2)))-1
         if pokemon_choice in range(0, len(party)):
-            party[pokemon_choice].learn_move(moves=[self.power], tm=self)
+            party[pokemon_choice].learn_move(party[pokemon_choice].level, moves=[self.move], tm=self)
             return True
         return True
 
@@ -794,6 +794,7 @@ class Player:
         self.received_ticket = False
         self.received_aerodactyl = False
         self.received_cut = False
+        self.received_pokeflute = False
         self.delivered_parcel = False
         self.map = ""
         self.pokedex = {}
@@ -939,13 +940,15 @@ class PokemonCenter(Location):
 # route
 class Route(Location):
 
-    def __init__(self, route_pokemon, route_levels, *links, trainer_pokemon = [], trainer_levels = [], name="Route 1"):
+    def __init__(self, route_pokemon, route_levels, *links, trainer_pokemon = [], trainer_levels = [], name="Route 1", pokeflute_required=False, surf_required=False):
         super().__init__(name)
         self.trainer_pokemon = trainer_pokemon
         self.trainer_levels = trainer_levels
         self.route_pokemon = route_pokemon
         self.route_levels = route_levels
         self.links = links
+        self.pokeflute_required = pokeflute_required
+        self.surf_required = surf_required
 
     def choose(self):
         for link in self.links:
@@ -953,28 +956,63 @@ class Route(Location):
                 self.source = link
             else:
                 self.destination = link
-        slow_type(f"1. Return to {self.source}\n2. Wild Battle" + (f"\n3. Go to {self.destination} (3 Trainer Battles)" if self.destination is not None else ""))
-        if self.destination is not None:
-            choice = get_valid_input("Enter number: ", [1, 2, 3])
-        else:
-            choice = get_valid_input("Enter number: ", [1, 2])
-        if choice == 1:
-            return True
-        elif choice == 2:
-            self.wild_battle()
-        elif choice == 3:
-            step_count = 3
-            while step_count != 0:
-                if not Battle([next(random.choice(self.trainer_pokemon).generate(random.choice(self.trainer_levels))) for i in range(1, random.randint(2, 3))], wild=False, trainer=True, trainer_name=random.choice(trainer_names), runnable=False).battle():
-                    player.map_location.black_out()
-                    return
-                else:
-                    step_count -= 1
-                    slow_type(f"{step_count} battle(s) left.")
-            slow_type(f"You made it to {self.destination}!")
-            time.sleep(1)
-            player.map_location = self.destination
-            return True
+
+        def go():
+            slow_type(f"1. Return to {self.source}\n2. Wild Battle" + (f"\n3. Go to {self.destination} (3 Trainer Battles)" if self.destination is not None else ""))
+            if self.destination is not None:
+                choice = get_valid_input("Enter number: ", [1, 2, 3])
+            else:
+                choice = get_valid_input("Enter number: ", [1, 2])
+            if choice == 1:
+                return True
+            elif choice == 2:
+                self.wild_battle()
+            elif choice == 3:
+                step_count = 3
+                while step_count != 0:
+                    if not Battle([next(random.choice(self.trainer_pokemon).generate(random.choice(self.trainer_levels))) for i in range(1, random.randint(2, 3))], wild=False, trainer=True, trainer_name=random.choice(trainer_names), runnable=False).battle():
+                        player.map_location.black_out()
+                        return
+                    else:
+                        step_count -= 1
+                        slow_type(f"{step_count} battle(s) left.")
+                slow_type(f"You made it to {self.destination}!")
+                time.sleep(1)
+                player.map_location = self.destination
+                return True
+            
+        if self.surf_required:
+            surf_found = False
+            for hm in player.key_items:
+                if hm.name == "Surf":
+                    surf_found = True
+                    break
+            if surf_found:
+                slow_type("The water is too deep.")
+                time.sleep(0.5)
+                slow_type(f"{player.name} used surf!")
+                time.sleep(0.5)
+                if go():
+                    return True
+            else:
+                slow_type("The water is too deep.")
+                time.sleep(0.5)
+                return True
+            
+        if self.pokeflute_required:
+            if pokeflute in player.key_items:
+                slow_type(f"{player.name} used the PokeFlute!")
+                time.sleep(0.5)
+                slow_type("Snorlax moved for you!")
+                time.sleep(0.5)
+                if go():
+                    return True
+            else:
+                slow_type("There is a sleeping Snorlax in the way.\nMaybe something could wake it up...")
+
+        if not self.surf_required and not self.pokeflute_required:
+            if go():
+                return True
 
 # pokemon lab
 class PokemonLab(Location):
@@ -1206,11 +1244,11 @@ class MapLocation:
 
     def fly(self):
         slow_type(f"-------- You are in {player.map_location} --------")
-        slow_type("1. Pallet Town\n2. Viridian City\n3. Pewter City\n4. Cerulean City\n5. Saffron City\n6. Vermillion City\n7. Celadon City\n8. Back")
-        choice = get_valid_input("Enter number: ", [1,2,3,4,5,6,7,8])-1
-        if choice == 7:
+        slow_type("1. Pallet Town\n2. Viridian City\n3. Pewter City\n4. Cerulean City\n5. Saffron City\n6. Vermillion City\n7. Celadon City\n8. Lavender Town\n9. Back")
+        choice = get_valid_input("Enter number: ", [1,2,3,4,5,6,7,8,9])-1
+        if choice == 8:
             return True
-        cities = [pallet_town, viridian_city, pewter_city, cerulean_city, saffron_city, vermillion_city, celadon_city]
+        cities = [pallet_town, viridian_city, pewter_city, cerulean_city, saffron_city, vermillion_city, celadon_city, lavender_town]
         slow_type(f"Flying to {cities[choice]}...")
         time.sleep(2)
         player.map_location = cities[choice]
@@ -1622,19 +1660,19 @@ class BillsHome(MapLocation):
 class SSAnne(MapLocation):
 
     def __init__(self):
-        super().__init__("SS Anne Captain's Area")
-        self.pokemon_center = SSAnne.CaptainsQuarters()
+        super().__init__("SS Anne Captain's Quarters")
+        self.pokemon_center = SSAnne.Captain()
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_center]
         for route in routes:
             self.local_locations.insert(0, route)
 
-    class CaptainsQuarters(PokemonCenter):
+    class Captain(PokemonCenter):
 
         def __init__(self):
             self.string = "Aye, lad. You should be well rested now."
-            self.name = "Captain's Quarters"
+            self.name = "Captain"
 
         def choose(self):
             slow_type(f"1. Heal Pokemon\n2. Talk to Captain\n3. Return to {player.map_location}")
@@ -1657,6 +1695,58 @@ class SSAnne(MapLocation):
                     time.sleep(0.5)
             if choice == 3:
                 return True
+            
+class LavenderTown(MapLocation):
+
+    def __init__(self):
+        super().__init__("Lavender Town")
+        self.pokemon_center = PokemonCenter()
+        self.pokemart = Pokemart([Potion, FullHeal, Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball])
+        
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemon_center, self.pokemart]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+class TopOfPokemonTower(MapLocation):
+
+    def __init__(self):
+        super().__init__("Top of Pokemon Tower")
+        self.mrfuji = TopOfPokemonTower.MrFuji()
+
+    def initialize(self, *routes):
+        self.local_locations = [self.mrfuji]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+    class MrFuji(PokemonCenter):
+
+        def __init__(self):
+            self.string = "Take care."
+            self.name = "Mr. Fuji"
+
+        def choose(self):
+            slow_type(f"1. Heal Pokemon\n2. Talk to Mr. Fuji\n3. Return to {player.map_location}")
+            choice = get_valid_input("Enter number: ", [1, 2, 3])
+            if choice == 1:
+                self.heal()
+            if choice == 2:
+                if not player.received_pokeflute:
+                    new_line()
+                    slow_type(f"Thank you for visiting...\nPlease take this Pokeflute as my thanks.")
+                    time.sleep(0.5)
+                    slow_type(f"{player.name} obtained the PokeFlute!")
+                    player.key_items.append(pokeflute)
+                    player.received_pokeflute = True
+                    time.sleep(1)
+                    time.sleep(0.5)
+                else:
+                    new_line()
+                    slow_type("Take all the time you need.")
+                    time.sleep(0.5)
+            if choice == 3:
+                return True
 
 # create player
 player = Player(name="Player", money=0)
@@ -1672,10 +1762,12 @@ except:
 amber = KeyItem("amber")
 parcel = KeyItem("Parcel")
 ss_anne_ticket = KeyItem("SS Anne Ticket")
+pokeflute = KeyItem("PokeFlute")
 
 # HMs
 hm_cut = HM(cut)
 hm_fly = HM(fly)
+hm_surf = HM(surf)
 
 # create locations
 pallet_town = PalletTown()
@@ -1688,6 +1780,8 @@ vermillion_city = VermillionCity()
 celadon_city = CeladonCity()
 bills_home = BillsHome()
 ss_anne = SSAnne()
+lavender_town = LavenderTown()
+top_of_pokemon_tower = TopOfPokemonTower()
 
 # initializing
 trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
@@ -1704,20 +1798,24 @@ route6 = Route([Pidgey(), Psyduck(), Mankey(), Pikachu(), Meowth(), Abra(), Jigg
 route8 = Route([Pidgey(), Pidgeotto(), Rattata(), Vulpix(), Jigglypuff(), Oddish(), Meowth(), Abra(), Mankey(), Growlithe()], [17, 18, 19, 20], saffron_city, celadon_city, trainer_levels=[17, 18, 19, 20, 21], trainer_pokemon=[Pidgeotto(), Jigglypuff(), Vulpix(), Meowth(), Growlithe(), Kadabra()], name="Route 8")
 route24 = Route([Venonat(), Pidgey(), Oddish(), Abra(), Kakuna(), Metapod()], [12, 13, 14, 15], cerulean_city, bills_home, trainer_levels=[12, 13, 14, 15], trainer_pokemon=[Kakuna(), Metapod(), Pidgeotto(), Abra(), Venonat()], name="Route 24/25")
 ss_anne_route = Route([Psyduck(), Seaking(), Tentacool(), Shellder(), Staryu(), Krabby()], [18, 19, 20, 21], ss_anne, vermillion_city, trainer_levels=[18, 19, 20, 21], trainer_pokemon=[Golduck(), Seaking(), Tentacool(), Shellder(), Voltorb(), Magnemite(), Pikachu(), Staryu(), Krabby()], name="SS Anne")
+pokemon_tower = Route([Ghastly(), Haunter(), Cubone()], [18, 19, 20, 21, 22, 23, 24], lavender_town, top_of_pokemon_tower, trainer_levels=[19, 20, 21, 22], trainer_pokemon=[Ghastly(), Haunter(), Cubone()], name="Pokemon Tower")
+route7 = Route([Jigglypuff(), Pidgey(), Vulpix(), Rattata(), Meowth(), Mankey(), Growlithe(), Abra(), Bellsprout()], [18, 19, 20, 21, 22], saffron_city, lavender_town, trainer_levels=[19, 20, 21, 22, 23], trainer_pokemon=[Abra(), Jigglypuff(), Mankey(), Growlithe(), Meowth(), Vulpix()], name="Route 7")
 
 map_object = MapLocation("Map")
 
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne]
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne, lavender_town, top_of_pokemon_tower]
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest, viridian_pond)
 pewter_city.initialize(viridian_forest, route3)
 mount_moon.initialize(route3, mt_moon_cave, route4)
 cerulean_city.initialize(route4, route5, route24, cerulean_river)
-saffron_city.initialize(route5, route6, route8)
+saffron_city.initialize(route5, route6, route7, route8)
 vermillion_city.initialize(route6, ss_anne_route)
 celadon_city.initialize(route8)
 bills_home.initialize(route24)
 ss_anne.initialize(ss_anne_route)
+lavender_town.initialize(route7, pokemon_tower)
+top_of_pokemon_tower.initialize(pokemon_tower)
 
 # intialize player location
 player.initialize()

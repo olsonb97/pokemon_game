@@ -75,7 +75,7 @@ thunder = Move("Thunder", 'electric', 11, 70)
 gunk_shot = Move("Gunk Shot", 'poison', 11, 80)
 splash = Move("Spash", 'normal', 0, 50)
 earth_power = Move("Earth Power", 'ground', 8, 100)
-wing_attack = Move("Wing Attack", 'flying', 5.5, 90)
+wing_attack = Move("Wing Attack", 'flying', 4.5, 90)
 drill_peck = Move("Drill Peck", 'flying', 8, 100)
 peck = Move("Peck", 'flying', 3.5, 100)
 hyper_voice = Move("Hyper Voice", 'normal', 9, 100)
@@ -127,6 +127,7 @@ fire_fang = Move("Fire Fang", 'fire', 7.5, 95)
 zap_cannon = Move("Zap Cannon", 'electric', 11, 50)
 slash = Move("Slash", 'normal', 7, 100)
 ancient_power = Move("Ancient Power", 'rock', 6, 100)
+ice_shard = Move("Ice Shard", 'ice', 4.5, 100)
 fly = Move("Fly", 'flying', 9, 100)
 flamethrower = Move("Flamethrower", 'fire', 9, 100)
 stun_spore = Move("Stun Spore", 'grass', 0, 75, special=True, status='paralyzed')
@@ -139,9 +140,11 @@ seed_bomb = Move("Seed Bomb", 'grass', 8, 100)
 power_whip = Move("Power Whip", 'grass', 11, 60)
 sing = Move("Sing", 'normal', 0, 55, special=True, status='asleep')
 rapid_spin = Move("Rapid Spin", 'normal', 7, 100)
+ice_beam = Move("Ice Beam", 'ice', 9, 100)
 crab_hammer = Move("Crab Hammer", 'water', 10, 90)
 bubble_beam = Move("Bubblebeam", 'water', 5.5, 100)
 mud_shot = Move("Mud Shot", 'ground', 5.5, 100)
+aurora_beam = Move("Aurora Beam", 'ice', 6.5, 100)
 giga_drain = Move("Giga Drain", 'grass', 8, 100)
 water_pulse = Move("Water Pulse", 'water', 7.5, 100)
 shell_smash = Move("Shell Smash", 'normal', 0, 100, stat='defense', stat_change=0.85, stat_target='enemy')
@@ -149,6 +152,7 @@ iron_defense = Move("Iron Defense", 'normal', 0, 100, stat='defense', stat_chang
 hydro_pump = Move("Hydro Pump", 'water', 11, 60)
 psyshock = Move("Psyshock", 'psychic', 7, 100)
 psybeam = Move("Psybeam", 'psychic', 8, 100)
+hex = Move("Hex", 'ghost', 6.5, 100)
 headbutt = Move("Headbutt", 'normal', 7, 100)
 psycho_cut = Move("Psycho Cut", 'psychic', 7.5, 100)
 covet = Move("Covet", 'normal', 6, 100)
@@ -297,32 +301,33 @@ class Pokemon:
             time.sleep(0.5)
             new_line()
             for move in moves:
-                if not move in self.move_set:
-                    if len(self.move_set) < 4:
-                        slow_type(f"{self.name} learned {move}!")
-                        self.move_set.append(move)
-                        time.sleep(1)
-                    else:
-                        slow_type(f"{self.name} is trying to learn {move}.")
-                        time.sleep(0.5)
-                        slow_type("Delete a move to make room?\n1. Yes\n2. No")
-                        choice = get_valid_input("Enter number: ", [1, 2])
-                        if choice == 1:
-                            new_line()
-                            slow_type(f"\n{move}" + (f" | Power: {move.power}" if not move.special else f" | Status: {move.status.capitalize()}") + (f" | Accuracy: {move.accuracy}\n"))
-                            for index, value in enumerate(self.move_set):
-                                slow_type(f"{index + 1}. {value}" + (f" | Power: {value.power}" if not value.special else f" | Status: {value.status.capitalize()}") + (f" | Accuracy: {value.accuracy}"))
-                            move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
-                            slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
+                for move2 in self.move_set:
+                    if not move.name == move2.name:
+                        if len(self.move_set) < 4:
+                            slow_type(f"{self.name} learned {move}!")
+                            self.move_set.append(move)
                             time.sleep(1)
-                            slow_type(f"...and learned {move}!")
+                        else:
+                            slow_type(f"{self.name} is trying to learn {move}.")
                             time.sleep(0.5)
-                            self.move_set[move_index] = move
-                        elif choice == 2:
-                            continue
-                else:
-                    slow_type(f"{self.name} tried to learn {move} but already knows it...")
-                    time.sleep(1)
+                            slow_type("Delete a move to make room?\n1. Yes\n2. No")
+                            choice = get_valid_input("Enter number: ", [1, 2])
+                            if choice == 1:
+                                new_line()
+                                slow_type(f"\n{move}" + (f" | Power: {move.power}" if not move.special else f" | Status: {move.status.capitalize()}") + (f" | Accuracy: {move.accuracy}\n"))
+                                for index, value in enumerate(self.move_set):
+                                    slow_type(f"{index + 1}. {value}" + (f" | Power: {value.power}" if not value.special else f" | Status: {value.status.capitalize()}") + (f" | Accuracy: {value.accuracy}"))
+                                move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
+                                slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
+                                time.sleep(1)
+                                slow_type(f"...and learned {move}!")
+                                time.sleep(0.5)
+                                self.move_set[move_index] = move
+                            elif choice == 2:
+                                continue
+                    else:
+                        slow_type(f"{self.name} tried to learn {move} but already knows it...")
+                        time.sleep(1)
         else:
             slow_type(f"{self} was unable to learn a move...")
     
@@ -363,6 +368,7 @@ class Pokemon:
             self.base_attack = self.evolve_pokemon1.base_attack
             self.base_defense = self.evolve_pokemon1.base_defense
             self.base_hp = self.evolve_pokemon1.base_hp
+            self.ptype = self.evolve_pokemon1.ptype
             self.update_stats(self.level)
             slow_type(f"{self.evolve_pokemon1} was registered in the Pokedex.")
             time.sleep(1)
@@ -381,6 +387,7 @@ class Pokemon:
             self.base_attack = self.evolve_pokemon2.base_attack
             self.base_defense = self.evolve_pokemon2.base_defense
             self.base_hp = self.evolve_pokemon2.base_hp
+            self.ptype = self.evolve_pokemon2.ptype
             self.update_stats(self.level)
             slow_type(f"{self.evolve_pokemon2} was registered in the Pokedex.")
             time.sleep(1)
@@ -585,7 +592,7 @@ class Ninetales(Pokemon):
 
 class Pidgey(Pokemon):
 
-    learnable_moves = {1: [growl, tackle], 7: [peck], 20: [wing_attack], 30: [aerial_ace, tackle, growl, headbutt]}
+    learnable_moves = {1: [growl, tackle], 7: [peck], 20: [wing_attack], 30: [aerial_ace]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Pidgey', 37, 'flying', 2, 1.9, level, moves, name, player_owned)
@@ -1041,4 +1048,36 @@ class Kingler(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Kingler', 42, 'water', 2.2, 1.95, level, moves, name, player_owned)
+
+class Tentacool(Pokemon):
+
+    learnable_moves = {1: [water_gun, poison_sting], 4: [acid], 8: [tackle], 12: [supersonic], 16: [water_pulse], 20: [screech], 24: [bubble_beam], 28: [hex], 36: [poison_jab]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Tentacool', 39, 'water', 1.9, 1.95, level, moves, name, player_owned)
+        self.evolve_level1 = 30
+        self.evolve_pokemon1 = Tentacruel()
+
+class Tentacruel(Pokemon):
+
+    learnable_moves = Tentacool.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Tentacruel', 42, 'water', 2.05, 2.05, level, moves, name, player_owned)
+
+class Shellder(Pokemon):
+
+    learnable_moves = {1: [tackle, water_gun], 4: [defense_curl], 8: [ice_shard], 12: [leer], 16: [water_pulse], 20: [supersonic], 24: [aurora_beam], 30: [ice_beam]} 
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Shellder', 39, 'water', 1.9, 1.95, level, moves, name, player_owned)
+        self.evolve_level1 = 30
+        self.evolve_pokemon1 = Cloyster()
+
+class Cloyster(Pokemon):
+
+    learnable_moves = Shellder.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Tentacruel', 42, 'ice', 2.15, 2.15, level, moves, name, player_owned)
 

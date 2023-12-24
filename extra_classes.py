@@ -126,7 +126,12 @@ growl = Move("Growl", 'normal', 0, 100, stat='attack', stat_change=0.9, stat_tar
 fire_fang = Move("Fire Fang", 'fire', 7.5, 95)
 zap_cannon = Move("Zap Cannon", 'electric', 11, 50)
 slash = Move("Slash", 'normal', 7, 100)
+hypnosis = Move("Hypnosis", 'psychic', 0, 60, special=True, status='asleep')
 ancient_power = Move("Ancient Power", 'rock', 6, 100)
+lick = Move("Lick", 'ghost', 3.5, 100)
+night_shade = Move("Night Shade", 'ghost', 7, 100)
+spite = Move("Spite", 'ghost', 5, 100)
+hex = Move("Hex", 'ghost', 6, 100)
 ice_shard = Move("Ice Shard", 'ice', 4.5, 100)
 fly = Move("Fly", 'flying', 9, 100)
 flamethrower = Move("Flamethrower", 'fire', 9, 100)
@@ -144,6 +149,7 @@ ice_beam = Move("Ice Beam", 'ice', 9, 100)
 crab_hammer = Move("Crab Hammer", 'water', 10, 90)
 bubble_beam = Move("Bubblebeam", 'water', 5.5, 100)
 mud_shot = Move("Mud Shot", 'ground', 5.5, 100)
+surf = Move("Surf", 'water', 9, 100)
 aurora_beam = Move("Aurora Beam", 'ice', 6.5, 100)
 giga_drain = Move("Giga Drain", 'grass', 8, 100)
 water_pulse = Move("Water Pulse", 'water', 7.5, 100)
@@ -300,34 +306,34 @@ class Pokemon:
         if approved:
             time.sleep(0.5)
             new_line()
+            move_name_list = [move2.name for move2 in self.move_set]
             for move in moves:
-                for move2 in self.move_set:
-                    if not move.name == move2.name:
-                        if len(self.move_set) < 4:
-                            slow_type(f"{self.name} learned {move}!")
-                            self.move_set.append(move)
-                            time.sleep(1)
-                        else:
-                            slow_type(f"{self.name} is trying to learn {move}.")
-                            time.sleep(0.5)
-                            slow_type("Delete a move to make room?\n1. Yes\n2. No")
-                            choice = get_valid_input("Enter number: ", [1, 2])
-                            if choice == 1:
-                                new_line()
-                                slow_type(f"\n{move}" + (f" | Power: {move.power}" if not move.special else f" | Status: {move.status.capitalize()}") + (f" | Accuracy: {move.accuracy}\n"))
-                                for index, value in enumerate(self.move_set):
-                                    slow_type(f"{index + 1}. {value}" + (f" | Power: {value.power}" if not value.special else f" | Status: {value.status.capitalize()}") + (f" | Accuracy: {value.accuracy}"))
-                                move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
-                                slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
-                                time.sleep(1)
-                                slow_type(f"...and learned {move}!")
-                                time.sleep(0.5)
-                                self.move_set[move_index] = move
-                            elif choice == 2:
-                                continue
-                    else:
-                        slow_type(f"{self.name} tried to learn {move} but already knows it...")
+                if not move.name in move_name_list:
+                    if len(self.move_set) < 4:
+                        slow_type(f"{self.name} learned {move}!")
+                        self.move_set.append(move)
                         time.sleep(1)
+                    else:
+                        slow_type(f"{self.name} is trying to learn {move}.")
+                        time.sleep(0.5)
+                        slow_type("Delete a move to make room?\n1. Yes\n2. No")
+                        choice = get_valid_input("Enter number: ", [1, 2])
+                        if choice == 1:
+                            new_line()
+                            slow_type(f"\n{move}" + (f" | Power: {move.power}" if not move.special else f" | Status: {move.status.capitalize()}") + (f" | Accuracy: {move.accuracy}\n"))
+                            for index, value in enumerate(self.move_set):
+                                slow_type(f"{index + 1}. {value}" + (f" | Power: {value.power}" if not value.special else f" | Status: {value.status.capitalize()}") + (f" | Accuracy: {value.accuracy}"))
+                            move_index = get_valid_input("Enter number: ", [1, 2, 3, 4])-1
+                            slow_type(f"{self.name} forgot {self.move_set[move_index]}...")
+                            time.sleep(1)
+                            slow_type(f"...and learned {move}!")
+                            time.sleep(0.5)
+                            self.move_set[move_index] = move
+                        elif choice == 2:
+                            continue
+                else:
+                    slow_type(f"{self.name} tried to learn {move} but already knows it...")
+                    time.sleep(1)
         else:
             slow_type(f"{self} was unable to learn a move...")
     
@@ -1081,3 +1087,29 @@ class Cloyster(Pokemon):
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Tentacruel', 42, 'ice', 2.15, 2.15, level, moves, name, player_owned)
 
+class Ghastly(Pokemon):
+    
+    learnable_moves = {1: [lick, confuse_ray], 4: [hypnosis], 16: [spite], 20: [hex], 28: [night_shade], 36: [shadow_ball]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Ghastly', 38, 'ghost', 2, 1.95, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Haunter()
+        self.evolve_level1 = 25
+        self.evolve_pokemon2 = Gengar()
+        self.evolve_level2 = 35
+
+class Haunter(Pokemon):
+    
+    learnable_moves = Ghastly.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Haunter', 41, 'ghost', 2.1, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Gengar()
+        self.evolve_level1 = 35
+
+class Gengar(Pokemon):
+    
+    learnable_moves = Ghastly.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Haunter', 44, 'ghost', 2.2, 2.05, level, moves, name, player_owned)

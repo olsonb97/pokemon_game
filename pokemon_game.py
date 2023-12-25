@@ -648,7 +648,7 @@ class Pokeball(Item):
 
     id = 1
     def __init__(self):
-        super().__init__("Pokeball", "catch", 25)
+        super().__init__("Pokeball", "catch", 15)
         self.cost = 50
         self.id = Pokeball.id
         Pokeball.id += 1
@@ -675,7 +675,7 @@ class Greatball(Item):
 
     id = 1
     def __init__(self):
-        super().__init__("Great Ball", "catch", 35)
+        super().__init__("Great Ball", "catch", 20)
         self.cost = 100
         self.id = Pokeball.id
         Greatball.id += 1
@@ -702,7 +702,7 @@ class Ultraball(Item):
 
     id = 1
     def __init__(self):
-        super().__init__("Ultra Ball", "catch", 45)
+        super().__init__("Ultra Ball", "catch", 25)
         self.cost = 150
         self.id = Pokeball.id
         Ultraball.id += 1
@@ -793,6 +793,7 @@ class Player:
         self.received_amber = False
         self.received_ticket = False
         self.received_aerodactyl = False
+        self.received_zapdos = False
         self.received_cut = False
         self.received_pokeflute = False
         self.delivered_parcel = False
@@ -825,7 +826,7 @@ class Player:
             self.local_location = vermillion_city.pokemon_center
             self.tms_hms.append(hm_fly)
             self.tms_hms.append(next(TM.generate(flamethrower)))
-            self.pokemon.append(Pidgeot(29, moves=Pidgeot.generate_moves(29), player_owned=True))
+            self.pokemon.append(Pidgeot(49, moves=Pidgeot.generate_moves(29), player_owned=True))
             self.money = 500
 
     def update_map(self):
@@ -1747,6 +1748,43 @@ class TopOfPokemonTower(MapLocation):
                     time.sleep(0.5)
             if choice == 3:
                 return True
+            
+class PowerPlant(MapLocation):
+
+    def __init__(self):
+        super().__init__("Power Plant")
+        self.zapdos = PowerPlant.Zapdos()
+
+    def initialize(self, *routes):
+        self.local_locations = [self.zapdos]
+        for route in routes:
+            self.local_locations.insert(0, route)
+
+    class Zapdos(Location):
+
+        def __init__(self):
+            self.name = "Zapdos"
+
+        def choose(self):
+            slow_type(f"1. Challenge Zapdos\n2. Return to {player.map_location}")
+            choice = get_valid_input("Enter number: ", [1, 2])
+            if choice == 1:
+                if not player.received_zapdos:
+                    slow_type(f"{player.name} steps up to the mysterious beast...")
+                    slow_type("......", 0.5)
+                    slow_type("It attacks!")
+                    time.sleep(1)
+                    if Battle([next(Zapdos.generate(50))], wild=True, runnable=False):
+                        player.received_zapdos = True
+                        slow_type("Zapdos is no longer here...")
+                        time.sleep(1)
+                else:
+                    slow_type("Zapdos is no longer here...")
+                    time.sleep(0.5)
+            elif choice == 2:
+                return True
+
+
 
 # create player
 player = Player(name="Player", money=0)
@@ -1782,6 +1820,7 @@ bills_home = BillsHome()
 ss_anne = SSAnne()
 lavender_town = LavenderTown()
 top_of_pokemon_tower = TopOfPokemonTower()
+power_plant = PowerPlant()
 
 # initializing
 trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
@@ -1800,10 +1839,11 @@ route24 = Route([Venonat(), Pidgey(), Oddish(), Abra(), Kakuna(), Metapod()], [1
 ss_anne_route = Route([Psyduck(), Seaking(), Tentacool(), Shellder(), Staryu(), Krabby()], [18, 19, 20, 21], ss_anne, vermillion_city, trainer_levels=[18, 19, 20, 21], trainer_pokemon=[Golduck(), Seaking(), Tentacool(), Shellder(), Voltorb(), Magnemite(), Pikachu(), Staryu(), Krabby()], name="SS Anne")
 pokemon_tower = Route([Ghastly(), Haunter(), Cubone()], [18, 19, 20, 21, 22, 23, 24], lavender_town, top_of_pokemon_tower, trainer_levels=[19, 20, 21, 22], trainer_pokemon=[Ghastly(), Haunter(), Cubone()], name="Pokemon Tower")
 route7 = Route([Jigglypuff(), Pidgey(), Vulpix(), Rattata(), Meowth(), Mankey(), Growlithe(), Abra(), Bellsprout()], [18, 19, 20, 21, 22], saffron_city, lavender_town, trainer_levels=[19, 20, 21, 22, 23], trainer_pokemon=[Abra(), Jigglypuff(), Mankey(), Growlithe(), Meowth(), Vulpix()], name="Route 7")
+route9 = Route([Sandshrew(), Rattata(), Spearow(), Fearow(), Ekans(), Mankey(), Cubone(), Venonat()], [14,15,16,17,18,19], power_plant, cerulean_city, trainer_levels=[14,15,16,17,18,19], trainer_pokemon=[Sandshrew(), Rattata(), Spearow(), Fearow(), Ekans(), Mankey(), Cubone(), Venonat()], name="Route 9")
 
 map_object = MapLocation("Map")
 
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne, lavender_town, top_of_pokemon_tower]
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne, lavender_town, top_of_pokemon_tower, power_plant]
 pallet_town.initialize(route1)
 viridian_city.initialize(route1, viridian_forest, viridian_pond)
 pewter_city.initialize(viridian_forest, route3)
@@ -1816,6 +1856,7 @@ bills_home.initialize(route24)
 ss_anne.initialize(ss_anne_route)
 lavender_town.initialize(route7, pokemon_tower)
 top_of_pokemon_tower.initialize(pokemon_tower)
+power_plant.initialize(route9)
 
 # intialize player location
 player.initialize()

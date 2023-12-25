@@ -1113,3 +1113,10 @@ class Gengar(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Haunter', 44, 'ghost', 2.2, 2.05, level, moves, name, player_owned)
+
+class Zapdos(Pokemon):
+
+    learnable_moves = {1: [peck, thunder_shock], 13: [thunder_wave], 20: [electro_ball], 49: [drill_peck], 50: [thunderbolt], 65: [thunder]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Zapdos', 46, 'electric', 2.25, 2.25, level, moves, name, player_owned)

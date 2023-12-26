@@ -823,12 +823,8 @@ class Player:
 
         except Exception as e:
             #TESTINGTESTINGTESTING
-            self.map_location = vermillion_city
-            self.local_location = vermillion_city.pokemon_center
-            self.tms_hms.append(hm_fly)
-            self.tms_hms.append(next(TM.generate(flamethrower)))
-            self.pokemon.append(Pidgeot(49, moves=Pidgeot.generate_moves(49), player_owned=True))
-            self.money = 500
+            self.map_location = pallet_town
+            self.local_location = pallet_town.pokemonlab
 
     def update_map(self):
         slow_type(f"""
@@ -2027,31 +2023,31 @@ def intro2():
 # game
 if __name__ == "__main__":
 
-    #if not player.tutorial_beat:
+    if not player.tutorial_beat:
 
-        #intro()
-        #get_starter()
-        #intro2()
+        intro()
+        get_starter()
+        intro2()
         
-        #while True:
-       #     if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
-         #       new_line()
-       #         slow_type("You're ready to set out.\nCatch Pokemon and train them.")
-       #         time.sleep(0.5)
-         #        slow_type(f"{player.name} received a map from Professor Oak!")
-        #         time.sleep(1)
-        #         slow_type(f"{player.name} received a Pokedex from Professor Oak!")
-        #         time.sleep(1)
-        #         slow_type("Head out towards Viridian City, if you wouldn't mind.\nI have someone at the Pokemon Center there waiting for you.")
-        #         time.sleep(0.5)
-        #         slow_type("Take care!")
-        #         time.sleep(0.5)
-        #        player.tutorial_beat = True
-        #        break
-        #    else:
-         #       player.map_location.black_out()
-         #       new_line()
-         #       slow_type("Ah, you're back. Let's try that again.")
+        while True:
+            if Battle([oak_pokemon], wild=False, trainer=True, trainer_name="Professor Oak", runnable=False).battle():
+                new_line()
+                slow_type("You're ready to set out.\nCatch Pokemon and train them.")
+                time.sleep(0.5)
+                slow_type(f"{player.name} received a map from Professor Oak!")
+                time.sleep(1)
+                slow_type(f"{player.name} received a Pokedex from Professor Oak!")
+                time.sleep(1)
+                slow_type("Head out towards Viridian City, if you wouldn't mind.\nI have someone at the Pokemon Center there waiting for you.")
+                time.sleep(0.5)
+                slow_type("Take care!")
+                time.sleep(0.5)
+                player.tutorial_beat = True
+                break
+            else:
+                player.map_location.black_out()
+                new_line()
+                slow_type("Ah, you're back. Let's try that again.")
     try:
         player.map_location.change_location()
     except:

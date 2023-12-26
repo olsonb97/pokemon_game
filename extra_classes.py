@@ -104,6 +104,7 @@ low_kick = Move("Low Kick", 'fighting', 5, 90)
 aqua_tail = Move("Aqua Tail", 'water', 7, 90)
 flame_wheel = Move("Flame Wheel", 'fire', 6, 90)
 razor_leaf = Move("Razor Leaf", 'grass', 7, 95)
+smog = Move("Smog", 'poison', 3, 70, special=True, status='poisoned')
 earthquake = Move("Earthquake", 'ground', 9, 90)
 seismic_toss = Move("Seismic Toss", 'fighting', 6.5, 100)
 bug_buzz = Move("Bug Buzz", 'bug', 8, 90)
@@ -130,8 +131,12 @@ hypnosis = Move("Hypnosis", 'psychic', 0, 60, special=True, status='asleep')
 ancient_power = Move("Ancient Power", 'rock', 6, 100)
 lick = Move("Lick", 'ghost', 3.5, 100)
 night_shade = Move("Night Shade", 'ghost', 7, 100)
+powder_snow = Move("Powder Snow", 'ice', 4, 100)
+freeze_dry = Move("Freeze-Dry", 'ice', 7, 100)
+mist = Move("Mist", 'ice', 0, 100, stat='attack', stat_change=0.9, stat_target='user')
 spite = Move("Spite", 'ghost', 5, 100)
 hex = Move("Hex", 'ghost', 6, 100)
+hurricane = Move("Hurricane", 'flying', 11, 70)
 ice_shard = Move("Ice Shard", 'ice', 4.5, 100)
 fly = Move("Fly", 'flying', 9, 100)
 flamethrower = Move("Flamethrower", 'fire', 9, 100)
@@ -1113,3 +1118,81 @@ class Gengar(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Haunter', 44, 'ghost', 2.2, 2.05, level, moves, name, player_owned)
+
+class Zapdos(Pokemon):
+
+    learnable_moves = {1: [peck, thunder_shock], 13: [thunder_wave], 20: [electro_ball], 49: [drill_peck], 50: [thunderbolt], 65: [thunder]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Zapdos', 46, 'electric', 2.25, 2.25, level, moves, name, player_owned)
+
+class Articuno(Pokemon):
+
+    learnable_moves = {1: [mist], 15: [ice_shard], 25: [ancient_power], 35: [ancient_power, freeze_dry], 45: [ice_beam], 50: [hurricane]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Articuno', 46, 'ice', 2.25, 2.25, level, moves, name, player_owned)
+
+class Slowpoke(Pokemon):
+
+    learnable_moves = {1: [tackle], 3: [growl], 6: [water_gun], 9: [yawn], 12: [confusion], 18: [water_pulse], 21: [headbutt], 24: [zen_headbutt], 30: [surf], 36: [psychic]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Slowpoke', 40, 'psychic', 2, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Slowbro()
+        self.evolve_level1 = 25
+        
+class Slowbro(Pokemon):
+
+    learnable_moves = Slowpoke.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Slowbro', 42, 'psychic', 2.1, 2.05, level, moves, name, player_owned)
+
+class Drowzee(Pokemon):
+
+    learnable_moves = {1: [tackle, hypnosis], 9: [confusion], 13: [headbutt], 17: [poison_powder], 21: [psybeam], 29: [zen_headbutt], 37: [psychic], 45: [psyshock]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Drowzee', 40, 'psychic', 2.05, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Hypno()
+        self.evolve_level1 = 28
+
+class Hypno(Pokemon):
+
+    learnable_moves = Drowzee.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Hypno', 42, 'psychic', 2.15, 2.05, level, moves, name, player_owned)
+
+class Koffing(Pokemon):
+
+    learnable_moves = {1: [smog, tackle, poison_sting], 20: [toxic], 24: [sludge_bomb], 30: [poison_jab]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Koffing', 39, 'poison', 2.05, 2.05, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Weezing()
+        self.evolve_level1 = 24
+
+class Weezing(Pokemon):
+
+    learnable_moves = Koffing.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Weezing', 41, 'poison', 2.1, 2.1, level, moves, name, player_owned)
+
+class Rhyhorn(Pokemon):
+
+    learnable_moves = {1: [tackle, tail_whip], 5: [rock_blast], 10: [bulldoze], 15: [horn_attack], 25: [headbutt], 30: [earth_power], 35: [rock_slide], 45: [earthquake]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Rhyhorn', 41, 'ground', 2.1, 2.1, level, moves, name, player_owned)
+        self.evolve_level1 = 42
+        self.evolve_pokemon1 = Rhydon()
+
+class Rhydon(Pokemon):
+
+    learnable_moves = Rhyhorn.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Rhyhorn', 45, 'ground', 2.2, 2.25, level, moves, name, player_owned)

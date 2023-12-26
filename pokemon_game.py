@@ -794,6 +794,7 @@ class Player:
         self.received_ticket = False
         self.received_aerodactyl = False
         self.received_zapdos = False
+        self.received_articuno = False
         self.received_cut = False
         self.received_pokeflute = False
         self.delivered_parcel = False
@@ -1251,11 +1252,11 @@ class MapLocation:
 
     def fly(self):
         slow_type(f"-------- You are in {player.map_location} --------")
-        slow_type("1. Pallet Town\n2. Viridian City\n3. Pewter City\n4. Cerulean City\n5. Saffron City\n6. Vermillion City\n7. Celadon City\n8. Lavender Town\n9. Fuschia City\n10. Back")
-        choice = get_valid_input("Enter number: ", [1,2,3,4,5,6,7,8,9,10])-1
-        if choice == 9:
+        slow_type("1. Pallet Town\n2. Viridian City\n3. Pewter City\n4. Cerulean City\n5. Saffron City\n6. Vermillion City\n7. Celadon City\n8. Lavender Town\n9. Fuschia City\n10. Cinnabar Island\n11. Back")
+        choice = get_valid_input("Enter number: ", [1,2,3,4,5,6,7,8,9,10,11])-1
+        if choice == 10:
             return True
-        cities = [pallet_town, viridian_city, pewter_city, cerulean_city, saffron_city, vermillion_city, celadon_city, lavender_town, fuschia_city]
+        cities = [pallet_town, viridian_city, pewter_city, cerulean_city, saffron_city, vermillion_city, celadon_city, lavender_town, fuschia_city, cinnabar_island]
         slow_type(f"Flying to {cities[choice]}...")
         time.sleep(2)
         player.map_location = cities[choice]
@@ -1319,9 +1320,14 @@ class PalletTown(MapLocation):
                     slow_type("Take care now!")
                     player.visited_mom = True
                 else:
-                    new_line()
-                    slow_type("Welcome home! I hope you're enjoying your adventure.\nBe careful and have fun.")
-                    time.sleep(0.5)
+                    if len(player.gym_badges) == 8:
+                        new_line()
+                        slow_type("Honey! You did it! Wow, all 8 gym badges.")
+                        time.sleep(0.5)
+                    else:
+                        new_line()
+                        slow_type("Welcome home! I hope you're enjoying your adventure.\nBe careful and have fun.")
+                        time.sleep(0.5)
             if choice == 3:
                 return True
 
@@ -1333,6 +1339,7 @@ class ViridianCity(MapLocation):
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball])
         self.mailman = ViridianCity.Mailman()
+        self.pokemon_gym = ViridianCity.ViridianPokemonGym([Rhyhorn(), Rhydon(), Sandslash(), Dugtrio()], [40,41,42,43,44], [next(Rhyhorn.generate(42)), next(Rhydon.generate(44)), next(Sandslash.generate(45)), next(Dugtrio.generate(48))], "Giovanni", "Viridian City Gym", (f"Thanks, {player.name}. I was looking for a battle like that.\nGlad you could provide it."), "Ground Badge", next(TM.generate(earthquake)))
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemon_center, self.pokemart, self.mailman]
@@ -1364,6 +1371,27 @@ class ViridianCity(MapLocation):
                     slow_type("Thanks for delivering that!")
                 else:
                     slow_type("Please deliver that parcel to Professor Oak.")
+                time.sleep(0.5)
+                return True
+            
+    class ViridianPokemonGym(PokemonGym):
+
+        def __init__(self, trainer_pokemon = [], trainer_levels = [], leader_pokemon=[], leader_name="Gym Leader", gym_name="", victory_message="", gym_badge="", prize=None):
+            super().__init__(trainer_pokemon, trainer_levels, leader_pokemon, leader_name, gym_name, victory_message, gym_badge, prize=None)
+
+        def choose(self):
+            if len(player.gym_badges) >= 7:
+                slow_type(f"1. Trainer Battle\n2. Challenge Gym Leader\n3. Return to {player.map_location}")
+                choice = get_valid_input("Enter number: ", [1, 2, 3])
+                if choice == 1:
+                    self.trainer_battle(self.trainer_pokemon, self.trainer_levels)
+                if choice == 2:
+                    if self.gym_battle(self.leader_pokemon, self.leader_name, badge=self.gym_badge, victory_message=self.victory_message):
+                        self.receive_prize()
+                if choice == 3:
+                    return True
+            else:
+                slow_type("There's no one here...\nI should check out some other gyms first.")
                 time.sleep(0.5)
                 return True
 
@@ -1461,7 +1489,7 @@ class CeruleanCity(MapLocation):
         super().__init__("Cerulean City")
         self.pokemon_center = PokemonCenter()
         self.pokemart = Pokemart([Potion, Attack_Boost, Defense_Boost, Pokeball, FullHeal, Greatball])
-        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [next(Staryu.generate(18)), next(Starmie.generate(21))], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge", next(TM.generate(water_pulse)))
+        self.pokemon_gym = PokemonGym([Goldeen(), Staryu()], [15, 16, 17, 18], [next(Staryu.generate(18)), next(Starmie.generate(21))], "Misty", "Cerulean City Gym", (f"Congrats, {player.name}! It's a rainy day for me...\nWell, have fun on the rest of your journey!"), "Water Badge", hm_fly)
 
     def initialize(self, *routes):
         self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
@@ -1773,6 +1801,7 @@ class PowerPlant(MapLocation):
     def __init__(self):
         super().__init__("Power Plant")
         self.zapdos = PowerPlant.Zapdos()
+        self.pokemon_center = PokemonCenter("Abandoned Research Center")
 
     def initialize(self, *routes):
         self.local_locations = [self.zapdos]
@@ -1819,6 +1848,7 @@ class SeafoamIslands(MapLocation):
     def __init__(self):
         super().__init__("Seafoam Islands")
         self.articuno = SeafoamIslands.Articuno()
+        self.pokemon_center = PokemonCenter("Research Center")
 
     def initialize(self, *routes):
         self.local_locations = [self.articuno]
@@ -1848,6 +1878,19 @@ class SeafoamIslands(MapLocation):
                     time.sleep(0.5)
             elif choice == 2:
                 return True
+            
+class CinnabarIsland(MapLocation):
+
+    def __init__(self):
+        super().__init__("Cinnabar Island")
+        self.pokemon_center = PokemonCenter()
+        self.pokemart = Pokemart([Potion, FullHeal, Attack_Boost, Defense_Boost, Pokeball, Greatball, Ultraball])
+        self.pokemon_gym = PokemonGym([Vulpix(), Ninetales(), Growlithe(), Charmeleon()], [37,38,39,40,41,42], [next(Ninetales.generate(40)), next(Charizard.generate(42)), next(Arcanine.generate(47))], "Blaine", "Cinnabar Island Gym", (f"Jeez, {player.name}, you really brought the heat!\nTake this badge!"), "Fire Badge", next(TM.generate(flamethrower)))
+
+    def initialize(self, *routes):
+        self.local_locations = [self.pokemart, self.pokemon_center, self.pokemon_gym]
+        for route in routes:
+            self.local_locations.insert(0, route)
 
 # create player
 player = Player(name="Player", money=0)
@@ -1887,6 +1930,7 @@ power_plant = PowerPlant()
 docks = Docks()
 fuschia_city = FuschiaCity()
 seafoam_islands = SeafoamIslands()
+cinnabar_island = CinnabarIsland()
 
 # initializing
 trainer_names = ["Janet", "Alissa", "Jim", "Gary", "Kaleb", "Lucas", "Vivian", "Marco", "Jake", "Harry", "Dawn", "May", "Brendan", "Alex", "Shauna", "Liko", "Goh", "Terry", "Jenny"]
@@ -1911,11 +1955,13 @@ route12 = Route([Poliwag(), Slowbro(), Tentacool(), Goldeen(), Magikarp()], [24,
 route11 = Route([Drowzee(), Sandshrew(), Pidgeotto(), Ekans(), Shellder(), Krabby()], [12,13,14,15,16], docks, vermillion_city, trainer_levels=[12,13,14,15,16], trainer_pokemon=[Drowzee(), Sandshrew(), Pidgeotto(), Ekans(), Shellder(), Krabby()], name="Route 11")
 route131415 = Route([Weepinbell(), Venomoth(), Pidgeotto(), Gloom(), Krabby(), Poliwag()], [12,13,14,15,16], docks, fuschia_city, trainer_levels=[12,13,14,15,16], trainer_pokemon=[Weepinbell(), Venomoth(), Pidgeotto(), Gloom(), Krabby(), Poliwag()], name="Route 13/14/15", step_count=5)
 route19 = Route([Tentacruel(), Kingler(), Poliwhirl(), Seaking()], [35,36,37,38,39], seafoam_islands, fuschia_city, trainer_levels=[35,36,37,38,39], trainer_pokemon=[Tentacruel(), Kingler(), Poliwhirl(), Seaking()], name="Route 19", step_count=5, surf_required=True)
+route20 = Route([Tentacruel(), Kingler(), Poliwhirl(), Seaking(), Gyarados()], [35,36,37,38,39], seafoam_islands, cinnabar_island, trainer_levels=[35,36,37,38,39], trainer_pokemon=[Tentacruel(), Kingler(), Poliwhirl(), Seaking(), Gyarados()], name="Route 20", surf_required=True)
+route21 = Route([Tentacruel(), Kingler(), Poliwhirl(), Seaking(), Gyarados()], [37,38,39,40,41,42], pallet_town, cinnabar_island, trainer_levels=[37,38,39,40,41,42], trainer_pokemon=[Tentacruel(), Kingler(), Poliwhirl(), Seaking(), Gyarados()], name="Route 21", surf_required=True)
 
 map_object = MapLocation("Map")
 
-map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne, lavender_town, top_of_pokemon_tower, power_plant, docks, fuschia_city, seafoam_islands]
-pallet_town.initialize(route1)
+map_object.map_locations = [pallet_town, viridian_city, pewter_city, mount_moon, cerulean_city, saffron_city, vermillion_city, celadon_city, bills_home, ss_anne, lavender_town, top_of_pokemon_tower, power_plant, docks, fuschia_city, seafoam_islands, cinnabar_island]
+pallet_town.initialize(route1, route21)
 viridian_city.initialize(route1, viridian_forest, viridian_pond)
 pewter_city.initialize(viridian_forest, route3)
 mount_moon.initialize(route3, mt_moon_cave, route4)
@@ -1930,7 +1976,8 @@ top_of_pokemon_tower.initialize(pokemon_tower)
 power_plant.initialize(route9, rock_tunnel)
 docks.initialize(route12, route11, route131415)
 fuschia_city.initialize(route131415, route19)
-seafoam_islands.initialize(route19)
+seafoam_islands.initialize(route19, route20)
+cinnabar_island.initialize(route20, route21)
 
 # intialize player location
 player.initialize()

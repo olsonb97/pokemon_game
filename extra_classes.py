@@ -1138,7 +1138,9 @@ class Slowpoke(Pokemon):
     learnable_moves = {1: [tackle], 3: [growl], 6: [water_gun], 9: [yawn], 12: [confusion], 18: [water_pulse], 21: [headbutt], 24: [zen_headbutt], 30: [surf], 36: [psychic]}
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
-        super().__init__('Slowpoke', 40, 'psychic', 2, 2, level, moves, name, player_owned)\
+        super().__init__('Slowpoke', 40, 'psychic', 2, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Slowbro()
+        self.evolve_level1 = 25
         
 class Slowbro(Pokemon):
 
@@ -1153,6 +1155,8 @@ class Drowzee(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Drowzee', 40, 'psychic', 2.05, 2, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Hypno()
+        self.evolve_level1 = 28
 
 class Hypno(Pokemon):
 
@@ -1167,10 +1171,28 @@ class Koffing(Pokemon):
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Koffing', 39, 'poison', 2.05, 2.05, level, moves, name, player_owned)
+        self.evolve_pokemon1 = Weezing()
+        self.evolve_level1 = 24
 
 class Weezing(Pokemon):
 
-    learnable_moves = {1: [smog, tackle, poison_sting], 20: [toxic], 24: [sludge_bomb], 30: [poison_jab]}
+    learnable_moves = Koffing.learnable_moves
 
     def __init__(self, level=5, name='', moves=None, player_owned=False):
         super().__init__('Weezing', 41, 'poison', 2.1, 2.1, level, moves, name, player_owned)
+
+class Rhyhorn(Pokemon):
+
+    learnable_moves = {1: [tackle, tail_whip], 5: [rock_blast], 10: [bulldoze], 15: [horn_attack], 25: [headbutt], 30: [earth_power], 35: [rock_slide], 45: [earthquake]}
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Rhyhorn', 41, 'ground', 2.1, 2.1, level, moves, name, player_owned)
+        self.evolve_level1 = 42
+        self.evolve_pokemon1 = Rhydon()
+
+class Rhydon(Pokemon):
+
+    learnable_moves = Rhyhorn.learnable_moves
+
+    def __init__(self, level=5, name='', moves=None, player_owned=False):
+        super().__init__('Rhyhorn', 45, 'ground', 2.2, 2.25, level, moves, name, player_owned)

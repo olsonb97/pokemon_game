@@ -843,7 +843,7 @@ Viridian                     Celadon <--- Rt. 8 <--- Saffron ---> Rt. 7 ---> Lav
  Pallet                                             Vermillion ---> Rt. 11 --> Docks
    ^                                                    V                        V
    ^                                                 SS Anne                     V
-   ^                                                                             V
+ Rt. 21                                                                          V
    ^                                                 Fuschia <------------- Rt.13/14/15
    ^                                                    V
 Cinnabar <---- Rt. 20 ---- Seafoam <------ Rt. 19 ------V
